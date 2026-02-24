@@ -1,41 +1,82 @@
 # YatriSetu - Smart Transit Platform for Delhi Transport Corporation
 
-## Project Overview
+## Executive Summary
 
-YatriSetu is a centralized smart transit platform designed for Delhi Transport Corporation (DTC) to modernize public transport services in Delhi.
+YatriSetu is a centralized smart transit platform designed for Delhi Transport Corporation (DTC) to modernize public transport services in Delhi through integrated technology solutions.
 
-### Objective
+## Project Objectives
 
-The objective of YatriSetu is to design and implement a centralized smart transit platform for Delhi Transport Corporation (DTC) that:
+The YatriSetu platform implements a centralized smart transit system for Delhi Transport Corporation (DTC) with the following objectives:
 
-- Provides real-time GPS-based bus tracking
-- Enables intelligent route planning for efficient travel
-- Supports online ticket booking with QR-based validation
-- Integrates a digital wallet for unified, cashless payments
-- Offers a centralized admin dashboard for monitoring operations and analytics
-- Implements an AI chatbot route assistant to:
-  - Suggest the shortest route
-  - Recommend the lowest fare options
-  - Ensure strong route connectivity & minimum transfers
-  - Guide users step-by-step to their destination
+| Objective | Description |
+|-----------|-------------|
+| Real-time GPS tracking | Provides live bus location tracking for passenger convenience |
+| Intelligent route planning | Enables efficient travel planning with multiple route options |
+| Online ticket booking | Supports digital ticket booking with QR-based validation |
+| Digital wallet integration | Implements unified, cashless payment system |
+| Centralized admin dashboard | Offers comprehensive monitoring and analytics capabilities |
+| AI chatbot assistant | Provides intelligent route guidance with multiple optimization criteria |
 
-**Overall Goal:** Improve passenger convenience, enhance operational efficiency, and modernize public transport services in Delhi.
+### AI Chatbot Capabilities
 
-### Problem Statement
+| Feature | Description |
+|---------|-------------|
+| Shortest route suggestions | Optimizes travel time |
+| Lowest fare recommendations | Minimizes travel cost |
+| Route connectivity analysis | Ensures minimum transfers |
+| Step-by-step guidance | Provides detailed navigation instructions |
 
-Delhi Transport Corporation (DTC) buses serve lakhs of commuters daily, yet passengers face uncertainty due to inconsistent arrival times, difficulty in route planning, and inconvenient fare payment methods.
+### Overall Goal
 
-Existing transport solutions provide limited features such as schedule information or GPS tracking, but they lack integration with predictive analytics, digital ticketing, and unified payment systems. Additionally, transport authorities lack centralized tools for real-time monitoring and data-driven decision-making.
+Improve passenger convenience, enhance operational efficiency, and modernize public transport services in Delhi.
 
-As a result, commuters experience longer waiting times, inefficient travel planning, and reduced service reliability.
+## Problem Statement
 
-Therefore, a centralized smart transit platform is needed to integrate real-time tracking, intelligent route guidance, and seamless digital ticketing to improve commuter convenience and operational efficiency.
+Delhi Transport Corporation (DTC) buses serve millions of commuters daily. However, passengers face significant challenges:
 
-### Proposed Solution
+| Challenge | Impact |
+|-----------|--------|
+| Inconsistent arrival times | Increased waiting time and uncertainty |
+| Difficult route planning | Inefficient travel decisions |
+| Inconvenient fare payment | Cash-dependent transactions |
+| Limited real-time information | Reduced service reliability |
 
-During the research phase, several existing transport management systems were analyzed. Platforms like RedBus provide centralized booking services but mainly focus on private and intercity buses. Government transport portals offer route and schedule information; however, they lack integrated digital ticketing and predictive analytics. Standalone GPS-based tracking systems are available, but they are not fully connected with payment and ticket validation systems.
+### Current Solution Limitations
 
-These observations highlight that although partial digital solutions exist, there is no comprehensive and unified platform specifically designed for Delhi Transport Corporation buses in Delhi. The absence of an integrated system combining real-time tracking, AI-based prediction, online ticket booking, and unified digital payments forms the foundation for the proposed solution, YatriSetu.
+Existing transport solutions provide fragmented features:
+
+| Solution Type | Limitations |
+|---------------|-------------|
+| Schedule information systems | No real-time tracking or predictive analytics |
+| GPS tracking systems | Not integrated with ticketing and payments |
+| Private bus platforms | Focus on intercity travel, not local transit |
+| Government portals | Lack digital ticketing and unified payments |
+
+### Identified Gap
+
+The absence of a comprehensive, unified platform specifically designed for Delhi Transport Corporation creates the need for YatriSetu - an integrated system combining real-time tracking, AI-based prediction, online ticket booking, and unified digital payments.
+
+## Proposed Solution
+
+### Market Analysis
+
+During the research phase, several existing transport management systems were analyzed:
+
+| Platform Type | Capabilities | Limitations |
+|---------------|-------------|-------------|
+| RedBus | Centralized booking | Focus on private/intercity buses |
+| Government portals | Route and schedule information | No integrated digital ticketing |
+| GPS tracking systems | Real-time location | Not connected with payments/validation |
+
+### Solution Foundation
+
+These observations highlight that although partial digital solutions exist, there is no comprehensive and unified platform specifically designed for Delhi Transport Corporation. YatriSetu addresses this gap by integrating:
+
+- Real-time GPS tracking
+- AI-based route prediction
+- Online ticket booking
+- Unified digital payment system
+- Centralized administrative dashboard
 
 ## Project Structure
 
@@ -58,53 +99,74 @@ YatriSetu_Prototype/
 
 ## Technology Stack
 
-- **Backend:** Python Flask
-- **Database:** PostgreSQL
-- **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5
-- **Charts:** Chart.js
-- **Icons:** Font Awesome
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Backend | Python Flask | Web application framework |
+| Database | PostgreSQL | Relational database management |
+| Frontend | HTML5, CSS3, JavaScript | User interface |
+| UI Framework | Bootstrap 5 | Responsive design |
+| Data Visualization | Chart.js | Analytics and reporting |
+| Icons | Font Awesome | UI iconography |
 
 ## Prerequisites
 
-See [PREREQUISITES.md](PREREQUISITES.md) for detailed setup instructions.
+Refer to [PREREQUISITES.md](docs/PREREQUISITES.md) for comprehensive setup instructions.
+
+### System Requirements
+
+| Component | Minimum Version |
+|-----------|----------------|
+| Python | 3.8+ |
+| PostgreSQL | 14+ |
+| RAM | 4GB |
+| Storage | 2GB free space |
 
 ## Quick Start
 
-1. Clone the repository
-2. Set up virtual environment: `python -m venv venv`
-3. Activate virtual environment: `venv\Scripts\activate` (Windows)
-4. Install dependencies: `pip install -r requirements.txt`
-5. Configure database connection in `config.py`
-6. Import database: `psql -U postgres -d yatrisetu < YATRISETU_DB.sql`
-7. Run application: `python run.py`
-8. Access application:
-   - **Home:** http://localhost:5000
-   - **AI Chatbot:** http://localhost:5000/chatbot
-   - **Admin Dashboard:** http://localhost:5000/admin
+### Installation Steps
+
+| Step | Command | Description |
+|------|---------|-------------|
+| 1 | Clone repository | Download project files |
+| 2 | `python -m venv venv` | Create virtual environment |
+| 3 | `venv\Scripts\activate` | Activate environment (Windows) |
+| 4 | `pip install -r requirements.txt` | Install dependencies |
+| 5 | Configure `config.py` | Set database connection |
+| 6 | `psql -U postgres -d yatrisetu < YATRISETU_DB.sql` | Import database |
+| 7 | `python run.py` | Start application |
+
+### Application Access
+
+| Interface | URL |
+|-----------|-----|
+| Home | http://localhost:5000 |
+| AI Chatbot | http://localhost:5000/chatbot |
+| Admin Dashboard | http://localhost:5000/admin |
 
 ## AI Chatbot Usage
 
-The AI chatbot provides intelligent assistance for:
+The AI chatbot provides intelligent assistance across multiple domains:
 
 ### Route Planning
-```
-You: "Route from Connaught Place to Dwarka"
-Bot: Shows shortest route, fare, duration, and distance
-```
+
+| User Query | System Response |
+|------------|----------------|
+| "Route from Connaught Place to Dwarka" | Displays shortest route, fare, duration, and distance |
 
 ### Fare Inquiry
-```
-You: "Fare to Kashmere Gate"
-Bot: Shows fare breakdown by passenger category
-```
+
+| User Query | System Response |
+|------------|----------------|
+| "Fare to Kashmere Gate" | Shows fare breakdown by passenger category |
 
 ### Booking Assistance
-```
-You: "Book ticket"
-Bot: Guides through booking process
-```
+
+| User Query | System Response |
+|------------|----------------|
+| "Book ticket" | Guides through booking process |
 
 ### Sample Queries
+
 - "How to reach Anand Vihar from ISBT?"
 - "Cheapest route to Dwarka"
 - "Show me routes with minimum transfers"
@@ -113,24 +175,44 @@ Bot: Guides through booking process
 ## Features
 
 ### AI Chatbot (WhatsApp-style Interface)
-- **Intelligent Route Assistant** with natural language processing
-- **Shortest Route Suggestions** based on duration and distance
-- **Lowest Fare Recommendations** with passenger category discounts
-- **Strong Route Connectivity** ensuring minimum transfers
-- **Step-by-Step Guidance** to destination
-- **Real-time Responses** with typing indicators
-- **Quick Suggestions** for common queries
-- **Conversation Context** maintenance
+
+| Feature | Description |
+|---------|-------------|
+| Intelligent Route Assistant | Natural language processing for query understanding |
+| Shortest Route Suggestions | Optimized based on duration and distance |
+| Lowest Fare Recommendations | Passenger category discounts applied |
+| Strong Route Connectivity | Ensures minimum transfers |
+| Step-by-Step Guidance | Detailed navigation to destination |
+| Real-time Responses | Typing indicators for user feedback |
+| Quick Suggestions | Common query shortcuts |
+| Conversation Context | Maintains session state |
 
 ### Admin Dashboard
-- Real-time bus tracking overview
-- Booking statistics and analytics
-- Revenue monitoring
-- User management
-- Route management
-- Fleet management
-- Payment transaction monitoring
+
+| Feature | Description |
+|---------|-------------|
+| Real-time bus tracking | Live GPS location monitoring |
+| Booking statistics | Comprehensive booking analytics |
+| Revenue monitoring | Financial performance tracking |
+| User management | Account administration |
+| Route management | Route configuration and updates |
+| Fleet management | Bus inventory and status |
+| Payment transactions | Transaction monitoring and reporting |
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+| Document | Description |
+|----------|-------------|
+| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Complete setup and installation guide |
+| [QUICKSTART.md](docs/QUICKSTART.md) | Quick setup for experienced developers |
+| [PREREQUISITES.md](docs/PREREQUISITES.md) | System requirements and dependencies |
+| [PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) | Architecture and codebase organization |
+| [CHATBOT_QUICK_REFERENCE.md](docs/CHATBOT_QUICK_REFERENCE.md) | Chatbot commands and API reference |
+| [ML_QUICKSTART.md](docs/ML_QUICKSTART.md) | Machine learning implementation guide |
+| [TESTING_GUIDE.md](docs/TESTING_GUIDE.md) | Testing procedures and guidelines |
 
 ## License
 
-© 2026 YatriSetu. All rights reserved.
+Copyright 2026 YatriSetu. All rights reserved.

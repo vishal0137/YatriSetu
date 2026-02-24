@@ -1,218 +1,293 @@
-# YatriSetu - Quick Start Guide
+# YatriSetu Quick Start Guide
 
-## For Windows Users
+## Prerequisites Verification
 
-### Prerequisites Check
+Before proceeding, ensure the following software is installed:
 
-Before starting, ensure you have:
-- ✓ Python 3.8+ installed
-- ✓ PostgreSQL 14+ installed
-- ✓ Database file: `YATRISETU_DB.sql` in project root
+| Requirement | Minimum Version | Verification Command |
+|-------------|----------------|---------------------|
+| Python | 3.8+ | `python --version` |
+| PostgreSQL | 14+ | `psql --version` |
+| Database File | YATRISETU_DB.sql | Check project root |
 
-### Quick Setup (5 Minutes)
+## Installation Methods
 
-#### Option 1: Automated Setup (Recommended)
+### Method 1: Automated Setup (Recommended)
 
 1. Open Command Prompt in project directory
-2. Run the setup script:
-   ```cmd
-   setup.bat
-   ```
-3. Follow the on-screen instructions
+2. Execute setup script:
 
-#### Option 2: Manual Setup
+```cmd
+setup.bat
+```
 
-1. **Create Virtual Environment**
-   ```cmd
-   python -m venv venv
-   ```
+3. Follow on-screen instructions
 
-2. **Activate Virtual Environment**
-   ```cmd
-   venv\Scripts\activate
-   ```
+### Method 2: Manual Setup
 
-3. **Install Dependencies**
-   ```cmd
-   pip install -r requirements.txt
-   ```
+#### Step 1: Create Virtual Environment
 
-4. **Configure Environment**
-   ```cmd
-   copy .env.example .env
-   ```
-   Edit `.env` and update database credentials
+```cmd
+python -m venv venv
+```
 
-5. **Setup Database**
-   ```cmd
-   psql -U postgres
-   ```
-   ```sql
-   CREATE DATABASE yatrisetu;
-   \q
-   ```
-   ```cmd
-   psql -U postgres -d yatrisetu < YATRISETU_DB.sql
-   ```
+#### Step 2: Activate Virtual Environment
 
-6. **Run Application**
-   ```cmd
-   python run.py
-   ```
+```cmd
+venv\Scripts\activate
+```
 
-7. **Access Dashboard**
-   Open browser: http://localhost:5000/admin
+#### Step 3: Install Dependencies
 
-### Default Credentials
+```cmd
+pip install -r requirements.txt
+```
 
-- Username: `admin`
-- Password: `admin123`
+#### Step 4: Configure Environment
 
-(Change these in `.env` file)
+```cmd
+copy .env.example .env
+```
 
-### Troubleshooting
+Edit `.env` file and update database credentials.
 
-#### "Python not found"
-Add Python to PATH:
-1. Search "Environment Variables"
-2. Edit System PATH
-3. Add Python directory
+#### Step 5: Database Setup
 
-#### "psql not found"
-Add PostgreSQL to PATH:
-- Default: `C:\Program Files\PostgreSQL\14\bin`
+```cmd
+psql -U postgres
+```
 
-#### "Connection refused"
-Check PostgreSQL service:
+```sql
+CREATE DATABASE yatrisetu;
+\q
+```
+
+```cmd
+psql -U postgres -d yatrisetu < YATRISETU_DB.sql
+```
+
+#### Step 6: Run Application
+
+```cmd
+python run.py
+```
+
+#### Step 7: Access Dashboard
+
+Navigate to: http://localhost:5000/admin
+
+## Default Credentials
+
+| Field | Value |
+|-------|-------|
+| Username | admin |
+| Password | admin123 |
+
+**Note:** Update credentials in `.env` file for production use.
+
+## Troubleshooting
+
+### Python Not Found
+
+**Solution:** Add Python to system PATH
+
+1. Open System Properties
+2. Navigate to Environment Variables
+3. Edit System PATH variable
+4. Add Python installation directory
+
+### PostgreSQL Command Not Found
+
+**Solution:** Add PostgreSQL to system PATH
+
+Default PostgreSQL location: `C:\Program Files\PostgreSQL\14\bin`
+
+### Database Connection Refused
+
+**Solution:** Verify PostgreSQL service status
+
 ```cmd
 services.msc
 ```
-Ensure "postgresql-x64-14" is running
 
-#### Port 5000 in use
-Change port in `run.py`:
+Ensure "postgresql-x64-14" service is running.
+
+### Port 5000 Already in Use
+
+**Solution:** Modify port in `run.py`
+
 ```python
 app.run(debug=True, port=5001)
 ```
 
-### Project Structure
+## Project Structure
 
 ```
 YatriSetu_Prototype/
 ├── app/
-│   ├── __init__.py          # App initialization
+│   ├── __init__.py          # Application initialization
 │   ├── models.py            # Database models
 │   ├── routes/
-│   │   └── admin.py         # Admin routes
+│   │   └── admin.py         # Admin route handlers
 │   └── templates/
 │       ├── base.html        # Base template
 │       └── admin/
-│           └── dashboard.html  # Dashboard
+│           └── dashboard.html  # Dashboard interface
 ├── venv/                     # Virtual environment
-├── config.py                 # Configuration
-├── run.py                    # Entry point
-├── requirements.txt          # Dependencies
+├── config.py                 # Configuration settings
+├── run.py                    # Application entry point
+├── requirements.txt          # Python dependencies
 ├── .env                      # Environment variables
-└── YATRISETU_DB.sql         # Database dump
+└── YATRISETU_DB.sql         # Database schema and data
 ```
 
-### Development Workflow
+## Development Workflow
 
-1. **Start Development**
-   ```cmd
-   cd C:\Project\YatriSetu_Prototype
-   venv\Scripts\activate
-   python run.py
-   ```
-
-2. **Make Changes**
-   - Edit files in `app/` directory
-   - Flask auto-reloads on save
-
-3. **Stop Server**
-   - Press `Ctrl+C`
-   - Deactivate: `deactivate`
-
-### API Endpoints
-
-- `GET /admin` - Dashboard
-- `GET /admin/api/stats` - Statistics
-- `GET /admin/api/bookings/recent` - Recent bookings
-- `GET /admin/api/revenue/monthly` - Monthly revenue
-- `GET /admin/api/buses/active` - Active buses
-
-### Database Schema
-
-Key tables:
-- `users` - User accounts
-- `buses` - Bus fleet
-- `routes` - Bus routes
-- `bookings` - Ticket bookings
-- `payments` - Payment transactions
-- `live_bus_locations` - GPS tracking
-- `wallets` - Digital wallets
-
-### Features Implemented
-
-✓ Dashboard with real-time statistics
-✓ Revenue analytics with charts
-✓ Booking status visualization
-✓ Recent bookings table
-✓ Active bus monitoring
-✓ Responsive design
-
-### Next Steps
-
-1. Explore the dashboard
-2. Review code structure
-3. Check API responses
-4. Customize as needed
-5. Add new features
-
-### Support
-
-For detailed documentation, see:
-- [README.md](README.md) - Project overview
-- [PREREQUISITES.md](PREREQUISITES.md) - Detailed setup
-
-### Common Commands
+### Starting Development
 
 ```cmd
-# Activate environment
+cd C:\Project\YatriSetu_Prototype
+venv\Scripts\activate
+python run.py
+```
+
+### Making Changes
+
+- Edit files in `app/` directory
+- Flask automatically reloads on file save (development mode)
+
+### Stopping Server
+
+- Press `Ctrl+C` in terminal
+- Deactivate environment: `deactivate`
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /admin | Dashboard interface |
+| GET | /admin/api/stats | System statistics |
+| GET | /admin/api/bookings/recent | Recent bookings |
+| GET | /admin/api/revenue/monthly | Monthly revenue data |
+| GET | /admin/api/buses/active | Active bus information |
+
+## Database Schema
+
+### Core Tables
+
+| Table | Description |
+|-------|-------------|
+| users | User account information |
+| buses | Bus fleet data |
+| routes | Bus route definitions |
+| bookings | Ticket booking records |
+| payments | Payment transactions |
+| live_bus_locations | GPS tracking data |
+| wallets | Digital wallet balances |
+
+## Implemented Features
+
+| Feature | Status |
+|---------|--------|
+| Real-time statistics dashboard | Implemented |
+| Revenue analytics with charts | Implemented |
+| Booking status visualization | Implemented |
+| Recent bookings table | Implemented |
+| Active bus monitoring | Implemented |
+| Responsive design | Implemented |
+
+## Next Steps
+
+1. Explore dashboard interface
+2. Review code structure
+3. Test API endpoints
+4. Customize configuration
+5. Implement additional features
+
+## Common Commands
+
+### Environment Management
+
+```cmd
+# Activate virtual environment
 venv\Scripts\activate
 
 # Install new package
 pip install package-name
-pip freeze > requirements.txt
 
-# Database backup
+# Update requirements file
+pip freeze > requirements.txt
+```
+
+### Database Operations
+
+```cmd
+# Create database backup
 pg_dump -U postgres yatrisetu > backup.sql
 
-# Database restore
+# Restore database from backup
 psql -U postgres -d yatrisetu < backup.sql
 
-# Check Python packages
+# List installed packages
 pip list
+```
 
-# Run tests (when implemented)
+### Testing
+
+```cmd
+# Run test suite (when implemented)
 python -m pytest
 ```
 
-### Performance Tips
+## Performance Optimization
 
-- Use database indexes for queries
-- Enable caching for static data
-- Optimize chart data queries
-- Use pagination for large datasets
+| Optimization | Implementation |
+|--------------|----------------|
+| Database indexes | Use for frequently queried columns |
+| Static data caching | Enable for reference data |
+| Chart data queries | Optimize with aggregation |
+| Large datasets | Implement pagination |
 
-### Security Notes
+## Security Considerations
 
-- Change default admin credentials
-- Use strong SECRET_KEY in production
-- Enable HTTPS in production
-- Implement rate limiting
-- Validate all user inputs
+| Security Measure | Priority |
+|-----------------|----------|
+| Change default credentials | Critical |
+| Use strong SECRET_KEY | Critical |
+| Enable HTTPS | Required for production |
+| Implement rate limiting | Recommended |
+| Validate user inputs | Critical |
 
----
+## Additional Resources
 
-**Ready to start?** Run `setup.bat` and you'll be up in 5 minutes!
+| Resource | Location |
+|----------|----------|
+| Project overview | README.md |
+| Detailed setup guide | PREREQUISITES.md |
+| Architecture documentation | docs/PROJECT_STRUCTURE.md |
+
+## Quick Reference
+
+### Application URLs
+
+| Interface | URL |
+|-----------|-----|
+| Home | http://localhost:5000 |
+| Admin Dashboard | http://localhost:5000/admin |
+| AI Chatbot | http://localhost:5000/chatbot |
+
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| .env | Environment variables |
+| config.py | Application configuration |
+| requirements.txt | Python dependencies |
+
+## Support
+
+For detailed documentation, refer to:
+
+- README.md - Project overview and features
+- PREREQUISITES.md - Comprehensive setup instructions
+- docs/ - Complete documentation library
