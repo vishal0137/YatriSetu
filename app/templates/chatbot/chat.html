@@ -1,0 +1,1055 @@
+{% extends "base.html" %}
+
+{% block title %}YatriSetu AI Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #e5ddd5;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    
+    .chat-container {
+        max-width: 900px;
+        margin: 0 auto;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .bot-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .bot-info h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    
+    .bot-info p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #e5ddd5 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QjUzMzBBMEU5QjNCMTFFNDk3NjhGNDdBMjU5QjY3QzQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QjUzMzBBMEY5QjNCMTFFNDk3NjhGNDdBMjU5QjY3QzQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpCNTMzMEEwQzlCM0IxMUU0OTc2OEY0N0EyNTlCNjdDNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpCNTMzMEEwRDlCM0IxMUU0OTc2OEY0N0EyNTlCNjdDNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRAA0wMaABZgJGBQjBqIIqBiYFCMGoAAQIMAEUGAQBVkJ8LAAAAAElFTkSuQmCC');
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .message.user {
+        justify-content: flex-end;
+    }
+    
+    .message-bubble {
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 8px;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    .message.bot .message-bubble {
+        background: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .message.user .message-bubble {
+        background: #dcf8c6;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .message-time {
+        font-size: 11px;
+        color: #667781;
+        margin-top: 5px;
+        text-align: right;
+    }
+    
+    .suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .suggestion-btn {
+        background: white;
+        border: 1px solid #2563eb;
+        color: #2563eb;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .suggestion-btn:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .chat-input-container {
+        background: #f0f2f5;
+        padding: 10px 15px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: none;
+        padding: 12px 15px;
+        border-radius: 25px;
+        font-size: 15px;
+        outline: none;
+        background: white;
+    }
+    
+    .send-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .send-btn:hover {
+        background: #1e40af;
+        transform: scale(1.05);
+    }
+    
+    .send-btn:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        transform: scale(1);
+    }
+    
+    .typing-indicator {
+        display: none;
+        padding: 10px 15px;
+        background: white;
+        border-radius: 8px;
+        width: fit-content;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .typing-indicator.active {
+        display: block;
+    }
+    
+    .typing-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #667781;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    .route-card {
+        background: #f8f9fa;
+        border-left: 4px solid #2563eb;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .route-card:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .route-card h4 {
+        margin: 0 0 8px 0;
+        color: #2563eb;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .route-detail {
+        font-size: 13px;
+        color: #495057;
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .popularity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+    
+    .popularity-badge.popular {
+        background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
+        color: #333;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    .route-count-badge {
+        display: inline-block;
+        background: #2563eb;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    
+    .destination-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .route-from-to {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    
+    .algorithm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    
+    .algorithm-badge.dijkstra {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .algorithm-badge.greedy {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .path-display {
+        background: #f8f9fa;
+        border-left: 3px solid #2563eb;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #495057;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .metric-highlight {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: inline-block;
+        margin: 6px 0;
+        font-weight: 600;
+        color: #2d3436;
+    }
+    
+    .bus-tracking-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 10px 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .bus-tracking-card h3 {
+        margin: 0 0 15px 0;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .bus-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .bus-info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .bus-info-label {
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    
+    .bus-info-value {
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .live-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #00b894;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+    
+    .live-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    .unavailable-badge {
+        background: #636e72;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    .welcome-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        padding: 40px;
+        color: #667781;
+    }
+    
+    .welcome-screen i {
+        font-size: 80px;
+        color: #2563eb;
+        margin-bottom: 20px;
+    }
+    
+    .welcome-screen h2 {
+        color: #111b21;
+        margin-bottom: 10px;
+    }
+    
+    .reset-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+    
+    .reset-btn:hover {
+        background: rgba(255,255,255,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <div class="chat-header-info">
+            <div class="bot-avatar">
+                <span style="font-size: 24px; font-weight: 700;">Y</span>
+            </div>
+            <div class="bot-info">
+                <h3>Sampark - YatriSetu Assistant</h3>
+                <p>Online • Always here to help</p>
+            </div>
+        </div>
+        <div>
+            <button class="reset-btn" onclick="resetChat()" title="Reset Chat">
+                <i class="fas fa-redo"></i>
+            </button>
+            <a href="/admin" class="reset-btn" title="Admin Dashboard">
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chatMessages">
+        <div class="welcome-screen" id="welcomeScreen">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <span style="font-size: 36px; font-weight: 700; color: white;">S</span>
+            </div>
+            <h2>Namaste! I'm Sampark</h2>
+            <p>Your intelligent transit companion for Delhi DTC buses</p>
+            <p style="margin-top: 20px;">Start a conversation by typing below or click a suggestion</p>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+        </div>
+    </div>
+    
+    <!-- Chat Input -->
+    <div class="chat-input-container">
+        <input 
+            type="text" 
+            class="chat-input" 
+            id="messageInput" 
+            placeholder="Type a message..."
+            autocomplete="off"
+        >
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    
+    let messageCount = 0;
+    
+    // Send message on Enter key
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // Auto-focus input
+    messageInput.focus();
+    
+    // Send initial greeting
+    setTimeout(() => {
+        sendInitialGreeting();
+    }, 500);
+    
+    function sendInitialGreeting() {
+        welcomeScreen.style.display = 'none';
+        sendMessageToBot('hi');
+    }
+    
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Clear input
+        messageInput.value = '';
+        
+        // Add user message to chat
+        addMessage(message, 'user');
+        
+        // Send to bot
+        await sendMessageToBot(message);
+    }
+    
+    async function sendMessageToBot(message) {
+        // Show typing indicator
+        typingIndicator.classList.add('active');
+        scrollToBottom();
+        
+        // Disable input
+        sendBtn.disabled = true;
+        messageInput.disabled = true;
+        
+        try {
+            const response = await fetch('/chatbot/api/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            const data = await response.json();
+            
+            // Hide typing indicator
+            typingIndicator.classList.remove('active');
+            
+            if (data.success) {
+                // Add bot response
+                setTimeout(() => {
+                    addMessage(data.response.message, 'bot', data.response.suggestions, data.response.routes);
+                }, 500);
+            } else {
+                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            typingIndicator.classList.remove('active');
+            addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'bot');
+        } finally {
+            // Re-enable input
+            sendBtn.disabled = false;
+            messageInput.disabled = false;
+            messageInput.focus();
+        }
+    }
+    
+    function addMessage(text, sender, suggestions = [], routes = []) {
+        messageCount++;
+        welcomeScreen.style.display = 'none';
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        // Parse and format message text with special handling
+        let formattedText = text;
+        
+        // Check message type
+        const isDestinationSearch = text.includes('🎯 All Routes to') || text.includes('📊 Found');
+        const hasPopularity = text.includes('🔥 Most Used') || text.includes('⭐ Popular');
+        const isDijkstra = text.includes('Dijkstra\'s Algorithm') || text.includes('⚡ Shortest Path');
+        const isGreedy = text.includes('Greedy Algorithm') || text.includes('💰 Cheapest Route');
+        const isBusTracking = text.includes('📍 Bus') || text.includes('🚌 Bus') && (text.includes('Type:') || text.includes('Capacity:'));
+        
+        if (isBusTracking) {
+            // Handle bus tracking results
+            const busNumberMatch = text.match(/(?:📍|🚌)\s+Bus\s+(\S+)/);
+            const typeMatch = text.match(/Type:\s+(.+?)(?:\n|$)/);
+            const capacityMatch = text.match(/Capacity:\s+(.+?)(?:\n|$)/);
+            const speedMatch = text.match(/Speed:\s+(.+?)(?:\n|$)/);
+            const updatedMatch = text.match(/Updated:\s+(.+?)(?:\n|$)/);
+            const unavailableMatch = text.includes('Live tracking unavailable');
+            const notFoundMatch = text.includes('not found');
+            
+            if (busNumberMatch) {
+                const busNumber = busNumberMatch[1];
+                
+                if (notFoundMatch) {
+                    // Bus not found
+                    bubbleDiv.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 15px;"></i>
+                            <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Bus ${busNumber} Not Found</h3>
+                            <p style="color: #7f8c8d; margin: 0;">Please check the bus number and try again</p>
+                        </div>
+                    `;
+                } else {
+                    // Create bus tracking card
+                    const trackingCard = document.createElement('div');
+                    trackingCard.className = 'bus-tracking-card';
+                    
+                    let cardContent = `
+                        <h3>
+                            <i class="fas fa-bus"></i>
+                            Bus ${busNumber}
+                            ${speedMatch && !unavailableMatch ? '<span class="live-indicator">LIVE</span>' : '<span class="unavailable-badge">Offline</span>'}
+                        </h3>
+                    `;
+                    
+                    if (typeMatch) {
+                        cardContent += `
+                            <div class="bus-info-row">
+                                <span class="bus-info-label"><i class="fas fa-tag"></i> Type</span>
+                                <span class="bus-info-value">${typeMatch[1]}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (capacityMatch) {
+                        cardContent += `
+                            <div class="bus-info-row">
+                                <span class="bus-info-label"><i class="fas fa-users"></i> Capacity</span>
+                                <span class="bus-info-value">${capacityMatch[1]}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (speedMatch && !unavailableMatch) {
+                        cardContent += `
+                            <div class="bus-info-row">
+                                <span class="bus-info-label"><i class="fas fa-tachometer-alt"></i> Speed</span>
+                                <span class="bus-info-value">${speedMatch[1]}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (updatedMatch) {
+                        cardContent += `
+                            <div class="bus-info-row">
+                                <span class="bus-info-label"><i class="fas fa-clock"></i> Last Updated</span>
+                                <span class="bus-info-value">${updatedMatch[1]}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (unavailableMatch) {
+                        cardContent += `
+                            <div style="text-align: center; padding: 15px 0; opacity: 0.8;">
+                                <i class="fas fa-info-circle"></i> Live tracking currently unavailable
+                            </div>
+                        `;
+                    }
+                    
+                    trackingCard.innerHTML = cardContent;
+                    bubbleDiv.appendChild(trackingCard);
+                }
+            } else if (text.includes('Track a bus')) {
+                // Track bus prompt
+                formattedText = text.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-map-marker-alt" style="font-size: 48px; color: #667eea; margin-bottom: 15px;"></i>
+                        <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Track a Bus</h3>
+                        ${formattedText}
+                    </div>
+                `;
+            } else {
+                // Fallback
+                formattedText = text.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = formattedText;
+            }
+        } else if (isDijkstra || isGreedy) {
+            // Handle algorithm results (Dijkstra or Greedy)
+            const algorithmType = isDijkstra ? 'dijkstra' : 'greedy';
+            const algorithmName = isDijkstra ? 'Dijkstra\'s Algorithm' : 'Greedy Algorithm';
+            const algorithmIcon = isDijkstra ? 'FAST' : 'COST';
+            const algorithmDesc = isDijkstra ? 'Shortest Path' : 'Minimum Fare';
+            
+            // Create algorithm badge
+            const badgeDiv = document.createElement('div');
+            badgeDiv.className = `algorithm-badge ${algorithmType}`;
+            badgeDiv.innerHTML = `
+                <i class="fas fa-${isDijkstra ? 'bolt' : 'coins'}"></i>
+                <span>${algorithmIcon} ${algorithmName}</span>
+            `;
+            bubbleDiv.appendChild(badgeDiv);
+            
+            // Extract route details
+            const fromMatch = text.match(/From:\s+(.+?)(?:\n|$)/);
+            const toMatch = text.match(/To:\s+(.+?)(?:\n|$)/);
+            const busMatch = text.match(/🚌\s+Bus:\s+(.+?)(?:\n|$)/);
+            const typeMatch = text.match(/Type:\s+(.+?)(?:\n|$)/);
+            const fareMatch = text.match(/💵\s+Total Fare:\s+₹([\d.]+)/);
+            const distanceMatch = text.match(/📏\s+(?:Total )?Distance:\s+([\d.]+)\s+km/);
+            const durationMatch = text.match(/⏱️\s+Duration:\s+(.+?)(?:\n|$)/);
+            const pathMatch = text.match(/🛣️\s+Path:\s+(.+?)(?:\n|$)/);
+            
+            if (fromMatch && toMatch) {
+                // Create route header
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'destination-header';
+                headerDiv.innerHTML = `
+                    <i class="fas fa-route"></i>
+                    <div>
+                        <div>${fromMatch[1]} → ${toMatch[1]}</div>
+                        <div style="font-size: 11px; opacity: 0.9;">${algorithmDesc}</div>
+                    </div>
+                `;
+                bubbleDiv.appendChild(headerDiv);
+                
+                // Create route card
+                const routeCard = document.createElement('div');
+                routeCard.className = 'route-card';
+                
+                let cardContent = '';
+                
+                if (busMatch) {
+                    cardContent += `
+                        <h4>
+                            <i class="fas fa-bus"></i>
+                            Bus ${busMatch[1]}
+                            ${typeMatch ? `<span style="font-size: 12px; color: #6c757d;">(${typeMatch[1]})</span>` : ''}
+                        </h4>
+                    `;
+                }
+                
+                // Add metrics
+                const metricsDiv = document.createElement('div');
+                metricsDiv.style.cssText = 'display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;';
+                
+                if (isDijkstra && distanceMatch) {
+                    metricsDiv.innerHTML += `
+                        <div class="metric-highlight">
+                            <i class="fas fa-road"></i> ${distanceMatch[1]} km
+                        </div>
+                    `;
+                }
+                
+                if (isGreedy && fareMatch) {
+                    metricsDiv.innerHTML += `
+                        <div class="metric-highlight">
+                            <i class="fas fa-rupee-sign"></i> ₹${fareMatch[1]}
+                        </div>
+                    `;
+                }
+                
+                if (fareMatch && isDijkstra) {
+                    metricsDiv.innerHTML += `
+                        <div style="padding: 6px 10px; background: #e9ecef; border-radius: 6px; font-size: 13px;">
+                            <i class="fas fa-rupee-sign"></i> ₹${fareMatch[1]}
+                        </div>
+                    `;
+                }
+                
+                if (distanceMatch && isGreedy) {
+                    metricsDiv.innerHTML += `
+                        <div style="padding: 6px 10px; background: #e9ecef; border-radius: 6px; font-size: 13px;">
+                            <i class="fas fa-road"></i> ${distanceMatch[1]} km
+                        </div>
+                    `;
+                }
+                
+                if (durationMatch) {
+                    metricsDiv.innerHTML += `
+                        <div style="padding: 6px 10px; background: #e9ecef; border-radius: 6px; font-size: 13px;">
+                            <i class="fas fa-clock"></i> ${durationMatch[1]}
+                        </div>
+                    `;
+                }
+                
+                cardContent += metricsDiv.outerHTML;
+                
+                // Add path if present
+                if (pathMatch) {
+                    cardContent += `
+                        <div class="path-display">
+                            <i class="fas fa-map-signs"></i> ${pathMatch[1]}
+                        </div>
+                    `;
+                }
+                
+                routeCard.innerHTML = cardContent;
+                bubbleDiv.appendChild(routeCard);
+            } else {
+                // Fallback formatting
+                formattedText = text.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = formattedText;
+            }
+        } else if (isDestinationSearch) {
+            // Extract destination and count
+            const destMatch = text.match(/All Routes to (.+?)(?:\n|$)/);
+            const countMatch = text.match(/Found (\d+) route\(s\)/);
+            
+            if (destMatch && countMatch) {
+                const destination = destMatch[1];
+                const count = countMatch[1];
+                
+                // Create destination header
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'destination-header';
+                headerDiv.innerHTML = `
+                    <i class="fas fa-map-marked-alt"></i>
+                    <div>
+                        <div>All Routes to ${destination}</div>
+                        <div style="font-size: 11px; opacity: 0.9;">Found ${count} route(s)</div>
+                    </div>
+                `;
+                bubbleDiv.appendChild(headerDiv);
+                
+                // Parse individual routes
+                const routeMatches = text.matchAll(/(\d+)\.\s+(.+?)\n\s+🚌\s+Bus\s+(.+?)\s+\((.+?)\)\n\s+💰\s+₹([\d.]+)(?:\s+\|\s+📏\s+([\d.]+)\s+km)?(?:\s+\|\s+(🔥 Most Used|⭐ Popular))?/g);
+                
+                for (const match of routeMatches) {
+                    const [_, num, fromTo, busNum, busType, fare, distance, popularity] = match;
+                    
+                    const routeCard = document.createElement('div');
+                    routeCard.className = 'route-card';
+                    
+                    let popularityBadge = '';
+                    if (popularity) {
+                        const badgeClass = popularity.includes('Most Used') ? 'popularity-badge' : 'popularity-badge popular';
+                        popularityBadge = `<span class="${badgeClass}">${popularity}</span>`;
+                    }
+                    
+                    routeCard.innerHTML = `
+                        <div class="route-from-to">${fromTo} → ${destination}</div>
+                        <h4>
+                            <i class="fas fa-bus"></i>
+                            Bus ${busNum}
+                            <span style="font-size: 12px; color: #6c757d;">(${busType})</span>
+                            ${popularityBadge}
+                        </h4>
+                        <div class="route-detail">
+                            <i class="fas fa-rupee-sign"></i>
+                            <strong>₹${fare}</strong>
+                            ${distance ? `<span style="margin-left: 10px;"><i class="fas fa-road"></i> ${distance} km</span>` : ''}
+                        </div>
+                    `;
+                    
+                    bubbleDiv.appendChild(routeCard);
+                }
+                
+                // Add "more routes" message if present
+                const moreMatch = text.match(/\.\.\. \+(\d+) more routes/);
+                if (moreMatch) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.style.cssText = 'text-align: center; padding: 10px; color: #6c757d; font-size: 13px;';
+                    moreDiv.innerHTML = `<i class="fas fa-ellipsis-h"></i> +${moreMatch[1]} more routes available`;
+                    bubbleDiv.appendChild(moreDiv);
+                }
+            } else {
+                // Fallback to regular formatting
+                formattedText = text.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = formattedText;
+            }
+        } else if (hasPopularity && text.includes('Routes:')) {
+            // Handle source → destination with popularity
+            const headerMatch = text.match(/Routes:\s+(.+?)\s+→\s+(.+?)(?:\n|$)/);
+            const countMatch = text.match(/Found (\d+) route\(s\)/);
+            
+            if (headerMatch) {
+                const [_, source, destination] = headerMatch;
+                
+                // Create header
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'destination-header';
+                headerDiv.innerHTML = `
+                    <i class="fas fa-route"></i>
+                    <div>
+                        <div>${source} → ${destination}</div>
+                        ${countMatch ? `<div style="font-size: 11px; opacity: 0.9;">Found ${countMatch[1]} route(s)</div>` : ''}
+                    </div>
+                `;
+                bubbleDiv.appendChild(headerDiv);
+                
+                // Parse routes
+                const routeMatches = text.matchAll(/(\d+)\.\s+Bus\s+(.+?)\s+\((.+?)\)\n\s+💰\s+₹([\d.]+)(?:\s+\|\s+📏\s+([\d.]+)\s+km)?(?:\n\s+(🔥 Most Used|⭐ Popular))?/g);
+                
+                for (const match of routeMatches) {
+                    const [_, num, busNum, busType, fare, distance, popularity] = match;
+                    
+                    const routeCard = document.createElement('div');
+                    routeCard.className = 'route-card';
+                    
+                    let popularityBadge = '';
+                    if (popularity) {
+                        const badgeClass = popularity.includes('Most Used') ? 'popularity-badge' : 'popularity-badge popular';
+                        popularityBadge = `<span class="${badgeClass}">${popularity}</span>`;
+                    }
+                    
+                    routeCard.innerHTML = `
+                        <h4>
+                            <i class="fas fa-bus"></i>
+                            Bus ${busNum}
+                            <span style="font-size: 12px; color: #6c757d;">(${busType})</span>
+                            ${popularityBadge}
+                        </h4>
+                        <div class="route-detail">
+                            <i class="fas fa-rupee-sign"></i>
+                            <strong>₹${fare}</strong>
+                            ${distance ? `<span style="margin-left: 10px;"><i class="fas fa-road"></i> ${distance} km</span>` : ''}
+                        </div>
+                    `;
+                    
+                    bubbleDiv.appendChild(routeCard);
+                }
+                
+                // Add "more routes" message if present
+                const moreMatch = text.match(/\.\.\. \+(\d+) more routes/);
+                if (moreMatch) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.style.cssText = 'text-align: center; padding: 10px; color: #6c757d; font-size: 13px;';
+                    moreDiv.innerHTML = `<i class="fas fa-ellipsis-h"></i> +${moreMatch[1]} more routes`;
+                    bubbleDiv.appendChild(moreDiv);
+                }
+            } else {
+                formattedText = text.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = formattedText;
+            }
+        } else {
+            // Regular message formatting
+            formattedText = text.replace(/\n/g, '<br>');
+            bubbleDiv.innerHTML = formattedText;
+        }
+        
+        // Add timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = new Date().toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        bubbleDiv.appendChild(timeDiv);
+        
+        messageDiv.appendChild(bubbleDiv);
+        
+        // Insert before typing indicator
+        chatMessages.insertBefore(messageDiv, typingIndicator);
+        
+        // Add suggestions if present
+        if (suggestions && suggestions.length > 0 && sender === 'bot') {
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'message bot';
+            
+            const suggestionsBubble = document.createElement('div');
+            suggestionsBubble.className = 'message-bubble';
+            
+            const suggestionsContainer = document.createElement('div');
+            suggestionsContainer.className = 'suggestions';
+            
+            suggestions.forEach(suggestion => {
+                const btn = document.createElement('button');
+                btn.className = 'suggestion-btn';
+                btn.textContent = suggestion;
+                btn.onclick = () => {
+                    messageInput.value = suggestion.replace(/[🚌💰📍❓🎫🔍⚡]/g, '').trim();
+                    sendMessage();
+                };
+                suggestionsContainer.appendChild(btn);
+            });
+            
+            suggestionsBubble.appendChild(suggestionsContainer);
+            suggestionsDiv.appendChild(suggestionsBubble);
+            chatMessages.insertBefore(suggestionsDiv, typingIndicator);
+        }
+        
+        scrollToBottom();
+    }
+    
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    async function resetChat() {
+        if (confirm('Reset conversation? This will clear all messages.')) {
+            try {
+                await fetch('/chatbot/api/reset', {
+                    method: 'POST'
+                });
+                
+                // Clear messages
+                const messages = chatMessages.querySelectorAll('.message');
+                messages.forEach(msg => msg.remove());
+                
+                // Show welcome screen
+                welcomeScreen.style.display = 'flex';
+                messageCount = 0;
+                
+                // Send greeting again
+                setTimeout(() => {
+                    sendInitialGreeting();
+                }, 500);
+            } catch (error) {
+                console.error('Error resetting chat:', error);
+            }
+        }
+    }
+</script>
+{% endblock %}

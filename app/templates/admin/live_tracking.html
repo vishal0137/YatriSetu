@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% block title %}Live Bus Tracking - YatriSetu{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Live Tracking Styles */
+    .tracking-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+        height: calc(100vh - 200px);
+    }
+    
+    /* Bus List Sidebar */
+    .bus-list-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: var(--shadow-md);
+        overflow-y: auto;
+    }
+    
+    .bus-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .bus-list-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .active-count {
+        background: var(--accent-primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    
+    .bus-item {
+        padding: 16px;
+        margin-bottom: 12px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .bus-item:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-sm);
+        border-color: var(--accent-primary);
+    }
+    
+    .bus-item.active {
+        background: linear-gradient(135deg, rgba(255, 107, 74, 0.1), rgba(255, 138, 107, 0.1));
+        border-color: var(--accent-primary);
+    }
+    
+    .bus-number {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+    
+    .bus-route {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    
+    .bus-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-dot.moving {
+        background: #10b981;
+    }
+    
+    .status-dot.stopped {
+        background: #f59e0b;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(0.9); }
+    }
+    
+    /* Route Visualization Canvas */
+    .route-canvas {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .canvas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    
+    .route-info h2 {
+        margin: 0 0 4px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .route-info p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+    
+    .canvas-controls {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .control-btn {
+        padding: 10px 20px;
+        border: 2px solid var(--border-color);
+        background: white;
+        color: var(--text-primary);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .control-btn:hover {
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+    
+    .control-btn.active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+        color: white;
+    }
+    
+    /* SVG Route Visualization */
+    #routeVisualization {
+        width: 100%;
+        height: calc(100% - 80px);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    /* Station Styles */
+    .station {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .station:hover .station-circle {
+        r: 12;
+        fill: var(--accent-primary);
+    }
+    
+    .station-circle {
+        transition: all 0.3s;
+    }
+    
+    /* Bus Icon Styles */
+    .bus-icon {
+        cursor: pointer;
+        transition: all 0.3s;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .bus-icon:hover {
+        transform: scale(1.2);
+    }
+    
+    /* Info Panel */
+    .info-panel {
+        position: absolute;
+        top: 100px;
+        right: 40px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: var(--shadow-lg);
+        min-width: 280px;
+        z-index: 10;
+        animation: slideInRight 0.3s;
+    }
+    
+    .info-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .info-panel-header h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .close-info {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+    
+    .info-label {
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    
+    .info-value {
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+    
+    /* Legend */
+    .legend {
+        position: absolute;
+        bottom: 40px;
+        left: 40px;
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .legend-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    .legend-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'live_tracking' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/live-tracking" class="nav-tab active">Live Tracking</a>
+            <a href="/admin/live-tracking" class="nav-tab">Route Map</a>
+            <a href="/admin/live-tracking" class="nav-tab">Analytics</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Live Bus Tracking</h1>
+            <p class="page-subtitle">Real-time bus location and route visualization</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="refreshTracking()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-primary-modern" onclick="toggleAutoRefresh()">
+                <i class="fas fa-play"></i> <span id="autoRefreshText">Auto Refresh</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Tracking Container -->
+    <div class="tracking-container">
+        <!-- Bus List Sidebar -->
+        <div class="bus-list-panel">
+            <div class="bus-list-header">
+                <h3>Active Buses</h3>
+                <span class="active-count" id="activeBusCount">0</span>
+            </div>
+            <div id="busList">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading buses...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Route Visualization -->
+        <div class="route-canvas">
+            <div class="canvas-header">
+                <div class="route-info">
+                    <h2 id="routeTitle">Select a bus to view route</h2>
+                    <p id="routeSubtitle">Click on any bus from the list to see its live location</p>
+                </div>
+                <div class="canvas-controls">
+                    <button class="control-btn" onclick="zoomIn()">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="control-btn" onclick="zoomOut()">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="control-btn" onclick="resetView()">
+                        <i class="fas fa-compress"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <svg id="routeVisualization" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+                <!-- Route path will be drawn here -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#FF6B4A" />
+                    </marker>
+                </defs>
+            </svg>
+            
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-title">Legend</div>
+                <div class="legend-item">
+                    <div class="legend-icon">
+                        <i class="fas fa-bus" style="color: var(--accent-primary);"></i>
+                    </div>
+                    <span>Active Bus</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon">
+                        <svg width="24" height="24">
+                            <circle cx="12" cy="12" r="6" fill="#10b981" />
+                        </svg>
+                    </div>
+                    <span>Current Station</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon">
+                        <svg width="24" height="24">
+                            <circle cx="12" cy="12" r="6" fill="#6b7280" />
+                        </svg>
+                    </div>
+                    <span>Other Stations</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon">
+                        <svg width="24" height="24">
+                            <line x1="2" y1="12" x2="22" y2="12" stroke="#FF6B4A" stroke-width="3" />
+                        </svg>
+                    </div>
+                    <span>Route Path</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/live-tracking.js"></script>
+{% endblock %}

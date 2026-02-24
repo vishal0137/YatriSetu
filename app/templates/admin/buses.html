@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Bus Fleet Management - YatriSetu{% endblock %}
+
+{% block content %}
+{% set active_page = 'buses' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/buses" class="nav-tab active">Fleet</a>
+            <a href="/admin/buses" class="nav-tab">Maintenance</a>
+            <a href="/admin/buses" class="nav-tab">Analytics</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Bus Fleet Management</h1>
+            <p class="page-subtitle">Real-time fleet monitoring and management</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="refreshFleet()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-primary-modern" onclick="addBus()">
+                <i class="fas fa-plus"></i> Add Bus
+            </button>
+        </div>
+    </div>
+            
+    <div id="alertContainer" class="mb-4"></div>
+    
+    <!-- Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Fleet</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalBuses">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-layer-group"></i>
+                    <span>All vehicles</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card accent">
+                <div class="metric-header">
+                    <span class="metric-label">Active Buses</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="activeBuses">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-circle"></i>
+                    <span>On route</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">In Maintenance</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="maintenanceBuses">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-wrench"></i>
+                    <span>Service</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Fleet Utilization</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="fleetUtilization">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+3.2%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <!-- Buses Table -->
+    <div class="card-modern">
+        <div class="card-header-modern">
+            <h3 class="card-title">All Buses</h3>
+            <div style="display: flex; gap: 12px;">
+                <div class="search-bar" style="width: 250px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search buses...">
+                </div>
+                <button class="btn-icon">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Bus Number</th>
+                    <th>Registration</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="busesTable">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px;">
+                        <div class="spinner-border" style="color: var(--accent-primary);"></div>
+                        <p style="margin-top: 12px; color: var(--text-muted);">Loading buses...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination-modern" id="paginationContainer"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/buses.js"></script>
+<script>
+    // Set demo data
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('maintenanceBuses').textContent = '8';
+        document.getElementById('fleetUtilization').textContent = '89.2%';
+    });
+    
+    function refreshFleet() {
+        location.reload();
+    }
+    
+    function addBus() {
+        alert('Add Bus functionality');
+    }
+</script>
+{% endblock %}
+

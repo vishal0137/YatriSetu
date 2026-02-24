@@ -1,0 +1,25 @@
+<!-- Top Navigation -->
+<div class="top-nav">
+    <div class="nav-tabs-custom">
+        {% block nav_tabs %}
+        <!-- Page-specific tabs will be inserted here -->
+        {% endblock %}
+    </div>
+    
+    <div class="nav-actions">
+        <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+            <div class="user-avatar">A</div>
+            <div class="user-info">
+                <div class="user-name">Admin User</div>
+                <div class="user-role">admin@yatrisetu.com</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+        </div>
+    </div>
+</div>

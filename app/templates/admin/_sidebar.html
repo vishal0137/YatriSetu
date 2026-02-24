@@ -1,0 +1,45 @@
+<!-- Compact Icon Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <i class="fas fa-bus"></i>
+    </div>
+    
+    <div class="sidebar-nav">
+        <a href="/admin" class="sidebar-item {% if active_page == 'dashboard' %}active{% endif %}" title="Dashboard">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/admin/chatbot" class="sidebar-item {% if active_page == 'chatbot' %}active{% endif %}" title="AI Chatbot">
+            <i class="fas fa-robot"></i>
+        </a>
+        <a href="/admin/live-tracking" class="sidebar-item {% if active_page == 'live_tracking' %}active{% endif %}" title="Live Tracking">
+            <i class="fas fa-map-marked-alt"></i>
+        </a>
+        <a href="/admin/bookings" class="sidebar-item {% if active_page == 'bookings' %}active{% endif %}" title="Bookings">
+            <i class="fas fa-ticket-alt"></i>
+        </a>
+        <a href="/admin/buses" class="sidebar-item {% if active_page == 'buses' %}active{% endif %}" title="Buses">
+            <i class="fas fa-bus"></i>
+        </a>
+        <a href="/admin/routes" class="sidebar-item {% if active_page == 'routes' %}active{% endif %}" title="Routes">
+            <i class="fas fa-route"></i>
+        </a>
+        <a href="/admin/drivers" class="sidebar-item {% if active_page == 'drivers' %}active{% endif %}" title="Drivers & Staff">
+            <i class="fas fa-id-card"></i>
+        </a>
+        <a href="/admin/users" class="sidebar-item {% if active_page == 'users' %}active{% endif %}" title="Users">
+            <i class="fas fa-users"></i>
+        </a>
+        <a href="/admin/payments" class="sidebar-item {% if active_page == 'payments' %}active{% endif %}" title="Payments">
+            <i class="fas fa-wallet"></i>
+        </a>
+    </div>
+    
+    <div class="sidebar-bottom">
+        <div class="sidebar-item" title="Settings" onclick="openSettings()" style="cursor: pointer;">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="sidebar-item" title="Logout" onclick="logout()" style="cursor: pointer;">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+    </div>
+</div>

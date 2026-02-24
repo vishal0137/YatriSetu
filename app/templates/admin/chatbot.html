@@ -1,0 +1,1574 @@
+{% extends "base.html" %}
+
+{% block title %}Sampark - YatriSetu AI Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Chat Interface Styles */
+    .chat-container {
+        background: #e5ddd5;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+        height: 650px;
+    }
+    
+    .chat-header {
+        background: var(--accent-primary);
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .bot-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .bot-info h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .bot-info p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.9;
+        color: white;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        background: #e5ddd5;
+    }
+    
+    .message {
+        margin-bottom: 16px;
+        display: flex;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .message.user {
+        justify-content: flex-end;
+    }
+    
+    .message-bubble {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        position: relative;
+        word-wrap: break-word;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .message.bot .message-bubble {
+        background: white;
+        color: var(--text-primary);
+    }
+    
+    .message.user .message-bubble {
+        background: #dcf8c6;
+        color: var(--text-primary);
+    }
+    
+    .message-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        text-align: right;
+    }
+    
+    /* Route Card Styles */
+    .route-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid var(--accent-primary);
+    }
+    
+    .route-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    
+    .route-number {
+        background: var(--accent-primary);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    
+    .route-type {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .route-type.ac {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+    
+    .route-path {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 12px 0;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .route-location {
+        flex: 1;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .route-arrow {
+        color: var(--accent-primary);
+        font-size: 20px;
+    }
+    
+    .route-details {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+    
+    .route-detail-item {
+        text-align: center;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+    
+    .route-detail-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    
+    .route-detail-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .route-detail-value.fare {
+        color: #2e7d32;
+    }
+    
+    /* Quick Action Buttons */
+    .quick-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .quick-action-btn {
+        flex: 1;
+        background: white;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .quick-action-btn:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    /* Message Feedback */
+    .message-feedback {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        align-items: center;
+    }
+    
+    .feedback-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .feedback-btn:hover {
+        background: #f0f2f5;
+        color: var(--accent-primary);
+    }
+    
+    .feedback-btn.active {
+        color: var(--accent-primary);
+    }
+    
+    /* Context Suggestions Bar */
+    .context-suggestions {
+        background: white;
+        padding: 12px 20px;
+        border-top: 1px solid #ddd;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    
+    .context-suggestions::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .context-chip {
+        background: #f0f2f5;
+        border: 1px solid #ddd;
+        color: var(--text-primary);
+        padding: 8px 14px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .context-chip:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+    
+    /* Loading Animation */
+    .message-loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--accent-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .suggestion-btn {
+        background: white;
+        border: 2px solid var(--accent-primary);
+        color: var(--accent-primary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .suggestion-btn:hover {
+        background: var(--accent-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .chat-input-container {
+        background: #f0f2f5;
+        padding: 16px 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        border-top: 1px solid #ddd;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: none;
+        padding: 14px 18px;
+        border-radius: 25px;
+        font-size: 15px;
+        outline: none;
+        background: white;
+        box-shadow: var(--shadow-sm);
+        color: var(--text-primary);
+    }
+    
+    .chat-input::placeholder {
+        color: var(--text-muted);
+    }
+    
+    .send-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent-primary);
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .send-btn:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        transform: scale(1);
+    }
+    
+    .typing-indicator {
+        display: none;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 10px;
+        width: fit-content;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .typing-indicator.active {
+        display: block;
+    }
+    
+    .typing-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    .welcome-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+    }
+    
+    .welcome-screen i {
+        font-size: 80px;
+        color: var(--accent-primary);
+        margin-bottom: 20px;
+    }
+    
+    .welcome-screen h2 {
+        color: var(--text-primary);
+        margin-bottom: 10px;
+    }
+    
+    .welcome-screen p {
+        color: var(--text-muted);
+    }
+    
+    .reset-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: background 0.2s;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .reset-btn:hover {
+        background: rgba(255,255,255,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'chatbot' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/chatbot" class="nav-tab active">Chat</a>
+            <a href="/admin/chatbot" class="nav-tab">Analytics</a>
+            <a href="/admin/chatbot" class="nav-tab">Settings</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Sampark - AI Assistant</h1>
+            <p class="page-subtitle">Your intelligent transit companion</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="showTutorial()">
+                <i class="fas fa-book-open"></i> Tutorial
+            </button>
+            <button class="btn-secondary-modern" onclick="loadMockConversation()">
+                <i class="fas fa-play"></i> Load Demo
+            </button>
+            <button class="btn-secondary-modern" onclick="window.open('/chatbot', '_blank')">
+                <i class="fas fa-external-link-alt"></i> Open in New Tab
+            </button>
+        </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="chat-header-info">
+                        <div class="bot-avatar">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="8" fill="white" fill-opacity="0.2"/>
+                                <path d="M16 4C15.4477 4 15 4.44772 15 5V6H11C9.34315 6 8 7.34315 8 9V22C8 23.6569 9.34315 25 11 25H21C22.6569 25 24 23.6569 24 22V9C24 7.34315 22.6569 6 21 6H17V5C17 4.44772 16.5523 4 16 4Z" fill="white"/>
+                                <circle cx="13" cy="13" r="1.5" fill="#667eea"/>
+                                <circle cx="19" cy="13" r="1.5" fill="#667eea"/>
+                                <path d="M13 18C13 18 14 20 16 20C18 20 19 18 19 18" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+                                <rect x="15" y="2" width="2" height="2" rx="1" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="bot-info">
+                            <h3>Sampark - YatriSetu Assistant</h3>
+                            <p>Online • Always here to help</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="reset-btn" onclick="resetChat()" title="Reset Chat">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent-primary) 0%, #764ba2 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: var(--shadow-lg);">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="60" height="60" rx="12" fill="white" fill-opacity="0.2"/>
+                                <path d="M30 8C28.8954 8 28 8.89543 28 10V12H20C16.6863 12 14 14.6863 14 18V42C14 45.3137 16.6863 48 20 48H40C43.3137 48 46 45.3137 46 42V18C46 14.6863 43.3137 12 40 12H32V10C32 8.89543 31.1046 8 30 8Z" fill="white"/>
+                                <circle cx="24" cy="24" r="3" fill="#667eea"/>
+                                <circle cx="36" cy="24" r="3" fill="#667eea"/>
+                                <path d="M24 34C24 34 26 38 30 38C34 38 36 34 36 34" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                                <rect x="28" y="4" width="4" height="4" rx="2" fill="white"/>
+                            </svg>
+                        </div>
+                        <h2 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px;">SAMPARK</h2>
+                        <p style="margin: 0 0 30px 0; color: var(--text-muted); font-size: 16px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Your Intelligent Transit Companion</p>
+                        
+                        <div style="margin-top: 30px; max-width: 700px;">
+                            <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: var(--shadow-md); text-align: left;">
+                                <h3 style="margin: 0 0 20px 0; color: var(--text-primary); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    SYSTEM CAPABILITIES
+                                </h3>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                    <!-- Direct Route Access -->
+                                    <div style="display: flex; align-items: start; gap: 15px;">
+                                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 18px;">
+                                            R
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">ROUTE INFORMATION</div>
+                                            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">Get complete route details instantly</div>
+                                            <div style="font-size: 11px; color: var(--text-primary); font-family: 'Courier New', monospace; background: #f8f9fa; padding: 6px 10px; border-radius: 4px; display: inline-block; cursor: pointer;" onclick="messageInput.value='Route 001'; sendMessage();">
+                                                Route 001
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Bus Information -->
+                                    <div style="display: flex; align-items: start; gap: 15px;">
+                                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 18px;">
+                                            B
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">BUS INFORMATION</div>
+                                            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">Bus details and assigned routes</div>
+                                            <div style="font-size: 11px; color: var(--text-primary); font-family: 'Courier New', monospace; background: #f8f9fa; padding: 6px 10px; border-radius: 4px; display: inline-block; cursor: pointer;" onclick="messageInput.value='Bus DTC-078'; sendMessage();">
+                                                Bus DTC-078
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Route Search -->
+                                    <div style="display: flex; align-items: start; gap: 15px;">
+                                        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 18px;">
+                                            S
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">ROUTE SEARCH</div>
+                                            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">Find routes between locations</div>
+                                            <div style="font-size: 11px; color: var(--text-primary); font-family: 'Courier New', monospace; background: #f8f9fa; padding: 6px 10px; border-radius: 4px; display: inline-block; cursor: pointer;" onclick="messageInput.value='Route from CP to Dwarka'; sendMessage();">
+                                                Route from CP to Dwarka
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Advanced Features -->
+                                    <div style="display: flex; align-items: start; gap: 15px;">
+                                        <div style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 18px;">
+                                            A
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">ADVANCED FEATURES</div>
+                                            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">Statistics, tracking, and more</div>
+                                            <div style="font-size: 11px; color: var(--text-primary); font-family: 'Courier New', monospace; background: #f8f9fa; padding: 6px 10px; border-radius: 4px; display: inline-block; cursor: pointer;" onclick="messageInput.value='Stats'; sendMessage();">
+                                                Stats
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center;">
+                                    <button onclick="showTutorial()" style="background: var(--accent-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        START INTERACTIVE TUTORIAL
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 25px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Type a command or select a suggestion to begin</p>
+                    </div>
+                    
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+                
+                <!-- Chat Input -->
+                <div class="context-suggestions" id="contextSuggestions">
+                    <!-- Dynamic suggestions will be inserted here -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <input 
+                        type="text" 
+                        class="chat-input" 
+                        id="messageInput" 
+                        placeholder="Type a message..."
+                        autocomplete="off"
+                    >
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chatbot-enhanced.js') }}"></script>
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const contextSuggestions = document.getElementById('contextSuggestions');
+    
+    let messageCount = 0;
+    let conversationContext = [];
+    
+    // Context-aware suggestions - EXACTLY matching backend responses
+    const suggestionSets = {
+        // Greeting suggestions (from greeting_response)
+        greeting: [
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Route 001' },
+            { icon: '', text: 'Bus DTC-078' },
+            { icon: '', text: 'Help' }
+        ],
+        // Initial/default suggestions
+        initial: [
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Route 001' },
+            { icon: '', text: 'Check Fare' },
+            { icon: '', text: 'Track Bus' }
+        ],
+        // Help command suggestions (from help_response)
+        help: [
+            { icon: '', text: 'Route 001' },
+            { icon: '', text: 'Bus DTC-078' },
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Stats' }
+        ],
+        // Statistics suggestions (from handle_statistics_query)
+        stats: [
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Track Bus' },
+            { icon: '', text: 'Route 001' }
+        ],
+        // Route by ID suggestions (from handle_route_by_id_query)
+        route_info: [
+            { icon: '', text: 'Book Ticket' },
+            { icon: '', text: 'Track Bus' },
+            { icon: '', text: 'New Search' }
+        ],
+        // Bus by ID suggestions (dynamic based on routes)
+        bus_info: [
+            { icon: '', text: 'Track Bus' },
+            { icon: '', text: 'New Search' }
+        ],
+        // Route search results (from generate_recommendations)
+        route_search: [
+            { icon: '', text: 'Book Ticket' },
+            { icon: '', text: 'Cheapest Route' },
+            { icon: '', text: 'Fastest Route' },
+            { icon: '', text: 'New Search' }
+        ],
+        // Location prompts (from find route/check fare) - CONVERSATIONAL FLOW
+        location: [
+            { icon: '', text: 'Connaught Place' },
+            { icon: '', text: 'IGI Airport' },
+            { icon: '', text: 'Kashmere Gate' },
+            { icon: '', text: 'Anand Vihar' },
+            { icon: '', text: 'Dwarka' },
+            { icon: '', text: 'Noida' }
+        ],
+        // Popular routes suggestions (from handle_popular_routes)
+        popular_routes: [
+            { icon: '', text: 'Book Ticket' },
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Stats' }
+        ],
+        // Booking instructions suggestions (from handle_booking_instructions)
+        booking_help: [
+            { icon: '', text: 'Ticket Types' },
+            { icon: '', text: 'General' },
+            { icon: '', text: 'Student' },
+            { icon: '', text: 'Senior Citizen' }
+        ],
+        // Ticket types suggestions (from handle_ticket_types)
+        ticket_types: [
+            { icon: '', text: 'How to Book' },
+            { icon: '', text: 'Check Fare' },
+            { icon: '', text: 'Find Route' }
+        ],
+        // Contact support suggestions (from handle_contact_support)
+        contact_support: [
+            { icon: '', text: 'How to Book' },
+            { icon: '', text: 'Ticket Types' },
+            { icon: '', text: 'Find Route' },
+            { icon: '', text: 'Stats' }
+        ],
+        // Tracking suggestions
+        tracking: [
+            { icon: '', text: 'Track Another' },
+            { icon: '', text: 'Find Route' }
+        ],
+        // Not found/error suggestions
+        not_found: [
+            { icon: '', text: 'Popular Routes' },
+            { icon: '', text: 'New Search' },
+            { icon: '', text: 'Help' }
+        ],
+        // Route list filtering suggestions (after route search, for cheapest/fastest filters)
+        route_list: [
+            { icon: '', text: 'Book Ticket' },
+            { icon: '', text: 'Cheapest Route' },
+            { icon: '', text: 'Fastest Route' },
+            { icon: '', text: 'All Routes' },
+            { icon: '', text: 'New Search' }
+        ]
+    };
+    
+    // Send message on Enter key
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // Update suggestions as user types
+    messageInput.addEventListener('input', function(e) {
+        updateContextSuggestions(e.target.value);
+    });
+    
+    // Auto-focus input
+    messageInput.focus();
+    
+    // Send initial greeting
+    setTimeout(() => {
+        sendInitialGreeting();
+    }, 500);
+    
+    function sendInitialGreeting() {
+        welcomeScreen.style.display = 'none';
+        updateContextSuggestions('', 'greeting');
+        sendMessageToBot('hi');
+    }
+    
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Clear input
+        messageInput.value = '';
+        
+        // Add user message to chat
+        addMessage(message, 'user');
+        conversationContext.push({ role: 'user', message: message });
+        
+        // Send to bot
+        await sendMessageToBot(message);
+    }
+    
+    async function sendMessageToBot(message) {
+        // Show typing indicator
+        typingIndicator.classList.add('active');
+        scrollToBottom();
+        
+        // Disable input
+        sendBtn.disabled = true;
+        messageInput.disabled = true;
+        
+        try {
+            const response = await fetch('/chatbot/api/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            const data = await response.json();
+            
+            // Simulate typing delay for more natural feel
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Hide typing indicator
+            typingIndicator.classList.remove('active');
+            
+            if (data.success) {
+                conversationContext.push({ role: 'bot', message: data.response.message });
+                
+                // Add bot response with enhanced rendering
+                addBotMessage(data.response);
+                
+                // Update context suggestions based on response
+                updateContextSuggestionsFromResponse(data.response);
+            } else {
+                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            typingIndicator.classList.remove('active');
+            addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'bot');
+        } finally {
+            // Re-enable input
+            sendBtn.disabled = false;
+            messageInput.disabled = false;
+            messageInput.focus();
+        }
+    }
+    
+    function addMessage(text, sender, suggestions = []) {
+        messageCount++;
+        welcomeScreen.style.display = 'none';
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        // Format message text with emojis and line breaks
+        let formattedText = text.replace(/\n/g, '<br>');
+        bubbleDiv.innerHTML = formattedText;
+        
+        // Add timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = new Date().toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        bubbleDiv.appendChild(timeDiv);
+        
+        messageDiv.appendChild(bubbleDiv);
+        
+        // Insert before typing indicator
+        chatMessages.insertBefore(messageDiv, typingIndicator);
+        
+        // Add suggestions if present
+        if (suggestions && suggestions.length > 0 && sender === 'bot') {
+            addSuggestionButtons(suggestions);
+        }
+        
+        scrollToBottom();
+    }
+    
+    function addBotMessage(response) {
+        messageCount++;
+        welcomeScreen.style.display = 'none';
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot';
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        // Check response type for special rendering
+        if (response.type === 'statistics' && response.stats) {
+            // Render statistics card
+            bubbleDiv.appendChild(window.chatbotEnhanced.createStatisticsCard(response.stats));
+        } else if (response.type === 'help' && response.help_categories) {
+            // Render help card
+            bubbleDiv.appendChild(window.chatbotEnhanced.createHelpCard(response));
+        } else if (response.type === 'route_info' && response.route_data) {
+            // Render route information card
+            bubbleDiv.appendChild(createRouteInfoCard(response.route_data, response.message));
+        } else if (response.type === 'bus_info' && response.bus_data) {
+            // Render bus information card
+            bubbleDiv.appendChild(createBusInfoCard(response.bus_data, response.message));
+        } else if (response.routes && response.routes.length > 0) {
+            // Render route cards
+            bubbleDiv.innerHTML = response.message.replace(/\n/g, '<br>');
+            
+            response.routes.forEach(route => {
+                const routeCard = createRouteCard(route);
+                bubbleDiv.appendChild(routeCard);
+            });
+        } else {
+            // Regular text message
+            bubbleDiv.innerHTML = response.message.replace(/\n/g, '<br>');
+        }
+        
+        // Add timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = new Date().toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        bubbleDiv.appendChild(timeDiv);
+        
+        // Add feedback buttons
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = 'message-feedback';
+        feedbackDiv.innerHTML = `
+            <button class="feedback-btn" onclick="giveFeedback(this, 'helpful')" title="Helpful">
+                <i class="fas fa-thumbs-up"></i>
+            </button>
+            <button class="feedback-btn" onclick="giveFeedback(this, 'not-helpful')" title="Not helpful">
+                <i class="fas fa-thumbs-down"></i>
+            </button>
+            <button class="feedback-btn" onclick="copyMessage(this)" title="Copy">
+                <i class="fas fa-copy"></i>
+            </button>
+        `;
+        bubbleDiv.appendChild(feedbackDiv);
+        
+        messageDiv.appendChild(bubbleDiv);
+        chatMessages.insertBefore(messageDiv, typingIndicator);
+        
+        // Add suggestions if present
+        if (response.suggestions && response.suggestions.length > 0) {
+            addSuggestionButtons(response.suggestions);
+        }
+        
+        scrollToBottom();
+    }
+    
+    function createRouteInfoCard(routeData, message) {
+        const container = document.createElement('div');
+        
+        // Add header with route number
+        const header = document.createElement('div');
+        header.style.cssText = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px;';
+        header.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">
+                        <i class="fas fa-route"></i> Route ${routeData.route_number}
+                    </div>
+                    <div style="font-size: 14px; opacity: 0.9;">${routeData.route_name || 'Route Information'}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> Active
+                </div>
+            </div>
+        `;
+        container.appendChild(header);
+        
+        // Journey section
+        const journeyCard = document.createElement('div');
+        journeyCard.className = 'route-card';
+        journeyCard.style.marginBottom = '12px';
+        journeyCard.innerHTML = `
+            <div style="font-size: 12px; color: #6c757d; font-weight: 600; margin-bottom: 10px;">
+                <i class="fas fa-map-marked-alt"></i> JOURNEY
+            </div>
+            <div class="route-path">
+                <div class="route-location">${routeData.start}</div>
+                <div class="route-arrow">→</div>
+                <div class="route-location">${routeData.end}</div>
+            </div>
+        `;
+        container.appendChild(journeyCard);
+        
+        // Bus information if available
+        if (routeData.bus_number) {
+            const busCard = document.createElement('div');
+            busCard.className = 'route-card';
+            busCard.style.marginBottom = '12px';
+            busCard.innerHTML = `
+                <div style="font-size: 12px; color: #6c757d; font-weight: 600; margin-bottom: 10px;">
+                    <i class="fas fa-bus"></i> ASSIGNED BUS
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: 700; color: var(--accent-primary);">${routeData.bus_number}</div>
+                        <div style="font-size: 13px; color: #6c757d;">${routeData.bus_type || 'Standard'}</div>
+                    </div>
+                    <button class="quick-action-btn" onclick="trackBus('${routeData.bus_number}')" style="margin: 0;">
+                        <i class="fas fa-map-marker-alt"></i> Track
+                    </button>
+                </div>
+            `;
+            container.appendChild(busCard);
+        }
+        
+        // Route details
+        const detailsCard = document.createElement('div');
+        detailsCard.className = 'route-card';
+        detailsCard.innerHTML = `
+            <div style="font-size: 12px; color: #6c757d; font-weight: 600; margin-bottom: 10px;">
+                <i class="fas fa-info-circle"></i> DETAILS
+            </div>
+            <div class="route-details">
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Fare</div>
+                    <div class="route-detail-value fare">₹${routeData.fare}</div>
+                </div>
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Distance</div>
+                    <div class="route-detail-value">${routeData.distance || 'N/A'} km</div>
+                </div>
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Duration</div>
+                    <div class="route-detail-value">${routeData.duration || 'N/A'} min</div>
+                </div>
+            </div>
+            ${routeData.stops_count ? `
+                <div style="margin-top: 12px; padding: 10px; background: #f8f9fa; border-radius: 6px; text-align: center;">
+                    <i class="fas fa-map-pin"></i> ${routeData.stops_count} stops along this route
+                </div>
+            ` : ''}
+        `;
+        container.appendChild(detailsCard);
+        
+        // Quick actions
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'quick-actions';
+        actionsDiv.style.marginTop = '12px';
+        actionsDiv.innerHTML = `
+            <button class="quick-action-btn" onclick="bookTicket('${routeData.route_number}')">
+                <i class="fas fa-ticket-alt"></i> Book Ticket
+            </button>
+            <button class="quick-action-btn" onclick="shareRoute('${routeData.route_number}')">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="quick-action-btn" onclick="messageInput.value='fare for route ${routeData.route_number}'; sendMessage();">
+                <i class="fas fa-rupee-sign"></i> Fare Details
+            </button>
+        `;
+        container.appendChild(actionsDiv);
+        
+        return container;
+    }
+    
+    function createBusInfoCard(busData, message) {
+        const container = document.createElement('div');
+        
+        // Add header with bus number
+        const header = document.createElement('div');
+        header.style.cssText = 'background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px;';
+        header.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">
+                        <i class="fas fa-bus"></i> ${busData.bus_number}
+                    </div>
+                    <div style="font-size: 14px; opacity: 0.9;">${busData.bus_type} • ${busData.capacity} seats</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                    <i class="fas fa-${busData.is_active ? 'check-circle' : 'times-circle'}"></i> ${busData.is_active ? 'Active' : 'Inactive'}
+                </div>
+            </div>
+        `;
+        container.appendChild(header);
+        
+        // Assigned routes section
+        if (busData.routes && busData.routes.length > 0) {
+            const routesHeader = document.createElement('div');
+            routesHeader.style.cssText = 'font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;';
+            routesHeader.innerHTML = `
+                <i class="fas fa-route"></i>
+                Assigned Routes (${busData.routes.length})
+            `;
+            container.appendChild(routesHeader);
+            
+            busData.routes.forEach((route, index) => {
+                const routeCard = document.createElement('div');
+                routeCard.className = 'route-card';
+                routeCard.style.marginBottom = '10px';
+                routeCard.style.cursor = 'pointer';
+                routeCard.onclick = () => {
+                    messageInput.value = `route ${route.route_number}`;
+                    sendMessage();
+                };
+                
+                routeCard.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                        <div style="font-size: 18px; font-weight: 700; color: var(--accent-primary);">
+                            Route ${route.route_number}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; background: #f8f9fa; padding: 4px 10px; border-radius: 12px;">
+                            ${route.route_name || 'Route'}
+                        </div>
+                    </div>
+                    <div class="route-path" style="margin-bottom: 10px;">
+                        <div class="route-location" style="font-size: 13px;">${route.start}</div>
+                        <div class="route-arrow">→</div>
+                        <div class="route-location" style="font-size: 13px;">${route.end}</div>
+                    </div>
+                    <div style="display: flex; gap: 15px; font-size: 13px; color: #6c757d;">
+                        <div><i class="fas fa-rupee-sign"></i> ₹${route.fare}</div>
+                        ${route.distance ? `<div><i class="fas fa-road"></i> ${route.distance} km</div>` : ''}
+                        ${route.duration ? `<div><i class="fas fa-clock"></i> ${route.duration} min</div>` : ''}
+                    </div>
+                    <div style="margin-top: 8px; font-size: 11px; color: #6c757d; text-align: right;">
+                        <i class="fas fa-hand-pointer"></i> Click for details
+                    </div>
+                `;
+                
+                container.appendChild(routeCard);
+            });
+        } else {
+            const noRoutesCard = document.createElement('div');
+            noRoutesCard.className = 'route-card';
+            noRoutesCard.style.textAlign = 'center';
+            noRoutesCard.style.color = '#6c757d';
+            noRoutesCard.innerHTML = `
+                <i class="fas fa-info-circle" style="font-size: 32px; margin-bottom: 10px; opacity: 0.5;"></i>
+                <div>No routes currently assigned to this bus</div>
+            `;
+            container.appendChild(noRoutesCard);
+        }
+        
+        // Quick actions
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'quick-actions';
+        actionsDiv.style.marginTop = '12px';
+        actionsDiv.innerHTML = `
+            <button class="quick-action-btn" onclick="trackBus('${busData.bus_number}')">
+                <i class="fas fa-map-marker-alt"></i> Track Bus
+            </button>
+            <button class="quick-action-btn" onclick="messageInput.value='buses like ${busData.bus_number}'; sendMessage();">
+                <i class="fas fa-search"></i> Similar Buses
+            </button>
+            <button class="quick-action-btn" onclick="shareRoute('${busData.bus_number}')">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+        `;
+        container.appendChild(actionsDiv);
+        
+        return container;
+    }
+    
+    function createRouteCard(route) {
+        const card = document.createElement('div');
+        card.className = 'route-card';
+        
+        card.innerHTML = `
+            <div class="route-card-header">
+                <span class="route-number">${route.route_number || 'N/A'}</span>
+                <span class="route-type ${route.bus_type === 'AC' ? 'ac' : ''}">${route.bus_type || 'Non-AC'}</span>
+            </div>
+            <div class="route-path">
+                <div class="route-location">${route.start_location || 'Start'}</div>
+                <div class="route-arrow">→</div>
+                <div class="route-location">${route.end_location || 'End'}</div>
+            </div>
+            <div class="route-details">
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Fare</div>
+                    <div class="route-detail-value fare">₹${route.fare || '0'}</div>
+                </div>
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Distance</div>
+                    <div class="route-detail-value">${route.distance || 'N/A'} km</div>
+                </div>
+                <div class="route-detail-item">
+                    <div class="route-detail-label">Duration</div>
+                    <div class="route-detail-value">${route.duration || 'N/A'} min</div>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="trackBus('${route.route_number}')">
+                    <i class="fas fa-map-marker-alt"></i> Track
+                </button>
+                <button class="quick-action-btn" onclick="bookTicket('${route.route_number}')">
+                    <i class="fas fa-ticket-alt"></i> Book
+                </button>
+                <button class="quick-action-btn" onclick="shareRoute('${route.route_number}')">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        `;
+        
+        return card;
+    }
+    
+    function addSuggestionButtons(suggestions) {
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.className = 'message bot';
+        
+        const suggestionsBubble = document.createElement('div');
+        suggestionsBubble.className = 'message-bubble';
+        
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'suggestions';
+        
+        suggestions.forEach(suggestion => {
+            const btn = document.createElement('button');
+            btn.className = 'suggestion-btn';
+            btn.textContent = suggestion; // Plain text, no emojis
+            btn.onclick = () => {
+                messageInput.value = suggestion;
+                sendMessage();
+            };
+            suggestionsContainer.appendChild(btn);
+        });
+        
+        suggestionsBubble.appendChild(suggestionsContainer);
+        suggestionsDiv.appendChild(suggestionsBubble);
+        chatMessages.insertBefore(suggestionsDiv, typingIndicator);
+    }
+    
+    function updateContextSuggestions(input, context = null) {
+        let suggestions = [];
+        
+        if (context) {
+            suggestions = suggestionSets[context] || suggestionSets.initial;
+        } else if (input.length === 0) {
+            suggestions = suggestionSets.initial;
+        } else {
+            const lowerInput = input.toLowerCase();
+            if (lowerInput.includes('route') || lowerInput.includes('bus') || lowerInput.includes('go')) {
+                suggestions = suggestionSets.route_search;
+            } else if (lowerInput.includes('from') || lowerInput.includes('to')) {
+                suggestions = suggestionSets.location;
+            } else if (lowerInput.includes('help') || lowerInput.includes('how')) {
+                suggestions = suggestionSets.help;
+            } else {
+                suggestions = suggestionSets.initial;
+            }
+        }
+        
+        renderContextSuggestions(suggestions);
+    }
+    
+    function updateContextSuggestionsFromResponse(response) {
+        const message = response.message.toLowerCase();
+        const type = response.type;
+        
+        // Update based on response type - matching backend exactly
+        if (type === 'greeting') {
+            updateContextSuggestions('', 'greeting');
+        } else if (type === 'help') {
+            updateContextSuggestions('', 'help');
+        } else if (type === 'statistics') {
+            updateContextSuggestions('', 'stats');
+        } else if (type === 'route_info') {
+            updateContextSuggestions('', 'route_info');
+        } else if (type === 'bus_info') {
+            updateContextSuggestions('', 'bus_info');
+        } else if (type === 'tracking') {
+            updateContextSuggestions('', 'tracking');
+        } else if (type === 'popular_routes') {
+            updateContextSuggestions('', 'popular_routes');
+        } else if (type === 'booking_help') {
+            updateContextSuggestions('', 'booking_help');
+        } else if (type === 'ticket_types') {
+            updateContextSuggestions('', 'ticket_types');
+        } else if (type === 'contact_support') {
+            updateContextSuggestions('', 'contact_support');
+        } else if (type === 'route_list') {
+            // Filtered route results (cheapest/fastest)
+            updateContextSuggestions('', 'route_list');
+        } else if (response.routes && response.routes.length > 0) {
+            updateContextSuggestions('', 'route_search');
+        } else if (message.includes('starting from') || message.includes('where do you want to go') || message.includes('enter your')) {
+            // Conversational flow - asking for location
+            updateContextSuggestions('', 'location');
+        } else if (message.includes('no routes found')) {
+            updateContextSuggestions('', 'not_found');
+        } else {
+            updateContextSuggestions('', 'initial');
+        }
+    }
+    
+    function renderContextSuggestions(suggestions) {
+        contextSuggestions.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const chip = document.createElement('div');
+            chip.className = 'context-chip';
+            // Display text only, no icons
+            chip.textContent = suggestion.text;
+            chip.onclick = () => {
+                messageInput.value = suggestion.text;
+                messageInput.focus();
+            };
+            contextSuggestions.appendChild(chip);
+        });
+    }
+    
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function giveFeedback(btn, type) {
+        btn.classList.toggle('active');
+        console.log('Feedback:', type);
+        // You can send feedback to server here
+    }
+    
+    function copyMessage(btn) {
+        const bubble = btn.closest('.message-bubble');
+        const text = bubble.innerText.replace(/\d{1,2}:\d{2}/, '').trim();
+        navigator.clipboard.writeText(text);
+        
+        const icon = btn.querySelector('i');
+        icon.className = 'fas fa-check';
+        setTimeout(() => {
+            icon.className = 'fas fa-copy';
+        }, 2000);
+    }
+    
+    function trackBus(routeNumber) {
+        messageInput.value = `Track bus ${routeNumber}`;
+        sendMessage();
+    }
+    
+    function bookTicket(routeNumber) {
+        messageInput.value = `Book ticket for ${routeNumber}`;
+        sendMessage();
+    }
+    
+    function shareRoute(routeNumber) {
+        const shareText = `Check out route ${routeNumber} on YatriSetu!`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'YatriSetu Route',
+                text: shareText
+            });
+        } else {
+            navigator.clipboard.writeText(shareText);
+            alert('Route link copied to clipboard!');
+        }
+    }
+    
+    async function resetChat() {
+        if (confirm('Reset conversation? This will clear all messages.')) {
+            try {
+                await fetch('/chatbot/api/reset', {
+                    method: 'POST'
+                });
+                
+                // Clear messages
+                const messages = chatMessages.querySelectorAll('.message');
+                messages.forEach(msg => msg.remove());
+                
+                // Reset context
+                conversationContext = [];
+                
+                // Show welcome screen
+                welcomeScreen.style.display = 'flex';
+                messageCount = 0;
+                
+                // Send greeting again
+                setTimeout(() => {
+                    sendInitialGreeting();
+                }, 500);
+            } catch (error) {
+                console.error('Error resetting chat:', error);
+            }
+        }
+    }
+    
+    async function loadMockConversation() {
+        try {
+            // Clear existing messages
+            const messages = chatMessages.querySelectorAll('.message');
+            messages.forEach(msg => msg.remove());
+            welcomeScreen.style.display = 'none';
+            
+            // Fetch mock conversation
+            const response = await fetch('/chatbot/api/mock-conversation');
+            const data = await response.json();
+            
+            if (data.success) {
+                // Display messages with delay for realistic effect
+                for (let i = 0; i < data.messages.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    const msg = data.messages[i];
+                    if (msg.sender === 'user') {
+                        addMessage(msg.message, 'user');
+                    } else {
+                        if (msg.routes && msg.routes.length > 0) {
+                            addBotMessage(msg);
+                        } else {
+                            addMessage(msg.message, 'bot', msg.suggestions);
+                        }
+                    }
+                }
+                
+                // Update suggestions
+                updateContextSuggestions('', 'route_search');
+            }
+        } catch (error) {
+            console.error('Error loading mock conversation:', error);
+        }
+    }
+    
+    async function showTutorial() {
+        // Clear existing messages
+        const messages = chatMessages.querySelectorAll('.message');
+        messages.forEach(msg => msg.remove());
+        welcomeScreen.style.display = 'none';
+        
+        // Tutorial steps
+        const tutorialSteps = [
+            {
+                type: 'bot',
+                message: "YATRISETU ASSISTANT TUTORIAL\n\nWelcome to the interactive tutorial. This guide will demonstrate the new capabilities of the system.",
+                suggestions: ['Continue']
+            },
+            {
+                type: 'bot',
+                message: "CAPABILITY 1: ROUTE INFORMATION\n\nYou can now retrieve complete route details by entering the route identifier.\n\nExample command: route 001",
+                suggestions: ['route 001', 'Skip Tutorial']
+            },
+            {
+                type: 'user',
+                message: 'route 001',
+                autoSend: true
+            },
+            {
+                type: 'bot',
+                message: "ROUTE INFORMATION DISPLAY\n\nThe system provides:\n• Route identification and name\n• Origin and destination points\n• Assigned vehicle details\n• Fare structure and distance\n• Duration estimates\n• Interactive action buttons\n\nProceeding to next capability.",
+                suggestions: ['Continue']
+            },
+            {
+                type: 'bot',
+                message: "CAPABILITY 2: BUS INFORMATION\n\nAccess comprehensive bus details including all assigned routes.\n\nExample command: bus DTC-078",
+                suggestions: ['bus DTC-078', 'Skip Tutorial']
+            },
+            {
+                type: 'user',
+                message: 'bus DTC-078',
+                autoSend: true
+            },
+            {
+                type: 'bot',
+                message: "BUS INFORMATION DISPLAY\n\nThe system provides:\n• Vehicle identification and specifications\n• All assigned routes (interactive)\n• Operational status\n• Quick action buttons\n\nNote: Route cards are clickable for detailed information.\n\nProceeding to next capability.",
+                suggestions: ['Continue']
+            },
+            {
+                type: 'bot',
+                message: "CAPABILITY 3: SMART SEARCH\n\nAll existing search functions remain available:\n\n• Route search: 'route from CP to Dwarka'\n• Fare inquiry: 'fare to Airport'\n• Live tracking: 'track bus 101'\n• Optimized routes: cheapest/fastest options\n\nSelect any command to test.",
+                suggestions: ['route from CP to Dwarka', 'fare to Airport', 'track bus 101']
+            },
+            {
+                type: 'bot',
+                message: "TUTORIAL COMPLETE\n\nYou are now familiar with all system capabilities.\n\nKEY POINTS:\n• Use route/bus identifiers for instant access\n• Click suggestion chips for quick commands\n• All cards include interactive elements\n• Type 'help' for command reference\n\nSystem ready for operation.",
+                suggestions: ['route 126', 'bus DTC-001', 'Find Route', 'Help']
+            }
+        ];
+        
+        // Display tutorial steps
+        let stepIndex = 0;
+        
+        async function showNextStep() {
+            if (stepIndex >= tutorialSteps.length) return;
+            
+            const step = tutorialSteps[stepIndex];
+            stepIndex++;
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            if (step.type === 'user') {
+                addMessage(step.message, 'user');
+                if (step.autoSend) {
+                    await sendMessageToBot(step.message);
+                }
+            } else {
+                addMessage(step.message, 'bot', step.suggestions);
+            }
+            
+            // Auto-advance for user messages
+            if (step.type === 'user' && step.autoSend) {
+                setTimeout(showNextStep, 2000);
+            }
+        }
+        
+        // Start tutorial
+        showNextStep();
+        
+        // Handle suggestion clicks during tutorial
+        document.addEventListener('click', function tutorialClickHandler(e) {
+            if (e.target.classList.contains('suggestion-btn')) {
+                const text = e.target.textContent.trim();
+                
+                if (text === 'Continue') {
+                    showNextStep();
+                } else if (text === 'Skip Tutorial') {
+                    // Remove tutorial handler
+                    document.removeEventListener('click', tutorialClickHandler);
+                    // Clear messages
+                    const messages = chatMessages.querySelectorAll('.message');
+                    messages.forEach(msg => msg.remove());
+                    // Send greeting
+                    sendInitialGreeting();
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

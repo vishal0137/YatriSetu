@@ -1,0 +1,774 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Management - YatriSetu{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Add gap between driver panels */
+    .row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin: 0;
+    }
+    
+    .row > .col-4,
+    .row > .col-3,
+    .row > .col-12 {
+        padding: 0;
+        width: 100%;
+    }
+    
+    /* Ensure full width for empty state */
+    .row > .col-12 {
+        grid-column: 1 / -1;
+    }
+    
+    /* Professional Tab Styles with Real-time Animation */
+    .staff-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 32px;
+        border-bottom: 2px solid var(--border-color);
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 0 24px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+    }
+    
+    .staff-tab {
+        padding: 16px 32px;
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        letter-spacing: 0.3px;
+        z-index: 1;
+    }
+    
+    .staff-tab::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 107, 74, 0.05);
+        opacity: 0;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .staff-tab::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        width: 0;
+        height: 3px;
+        background: var(--accent-primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+    
+    .staff-tab:hover::before {
+        opacity: 1;
+    }
+    
+    .staff-tab:hover {
+        color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+    
+    .staff-tab.active {
+        color: var(--accent-primary);
+    }
+    
+    .staff-tab.active::before {
+        opacity: 1;
+    }
+    
+    .staff-tab.active::after {
+        width: 100%;
+    }
+    
+    .staff-tab:active {
+        transform: translateY(0);
+    }
+    
+    .staff-tab-content {
+        display: none;
+        animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .staff-tab-content.active {
+        display: block;
+    }
+    
+    @keyframes fadeInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+    }
+    
+    /* Top Navigation Tabs with Real-time Animation */
+    .nav-tabs-custom {
+        display: flex;
+        gap: 8px;
+        position: relative;
+    }
+    
+    .nav-tab {
+        padding: 8px 20px;
+        border-radius: 10px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .nav-tab::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 10px;
+        background: rgba(255, 107, 74, 0.1);
+        transform: translate(-50%, -50%);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .nav-tab:hover::before {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .nav-tab:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-tab.active {
+        background: var(--text-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .nav-tab.active::before {
+        display: none;
+    }
+    
+    .nav-tab:active {
+        transform: translateY(0) scale(0.98);
+    }
+    
+    /* Professional Filter Buttons with Real-time Animation */
+    .filter-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 10px 20px;
+        border: 2px solid var(--border-color);
+        background: white;
+        color: var(--text-primary);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .filter-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 107, 74, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+    
+    .filter-btn:hover::before {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .filter-btn:hover {
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .filter-btn.active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+    }
+    
+    .filter-btn.active::before {
+        display: none;
+    }
+    
+    /* Professional Staff Card */
+    .staff-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .staff-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 107, 74, 0.05), transparent);
+        transition: left 0.5s;
+    }
+    
+    .staff-card:hover::before {
+        left: 100%;
+    }
+    
+    .staff-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(255, 107, 74, 0.2);
+    }
+    
+    .staff-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .staff-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent-primary), #ff8a65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        box-shadow: var(--shadow-md);
+        letter-spacing: 1px;
+    }
+    
+    .staff-info h3 {
+        margin: 0 0 6px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: 0.3px;
+    }
+    
+    .staff-id {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.5px;
+    }
+    
+    .staff-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .detail-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    
+    .detail-value {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .staff-assignment {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--accent-primary);
+    }
+    
+    .assignment-title {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        letter-spacing: 0.8px;
+    }
+    
+    .assignment-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .assignment-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .assignment-row .label {
+        color: var(--text-muted);
+        min-width: 60px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .assignment-row .value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+    
+    .staff-actions {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .action-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+    
+    .action-btn:hover::before {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .action-btn:active {
+        transform: translateY(0);
+    }
+    
+    .action-btn-primary {
+        background: var(--accent-primary);
+        color: white;
+    }
+    
+    .action-btn-secondary {
+        background: #f0f2f5;
+        color: var(--text-primary);
+        border: 2px solid var(--border-color);
+    }
+    
+    .action-btn-secondary:hover {
+        background: white;
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+    }
+    
+    /* Professional Shift Badge */
+    .shift-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .shift-morning {
+        background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        color: #e65100;
+        border: 2px solid #ffcc80;
+    }
+    
+    .shift-evening {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        color: #0d47a1;
+        border: 2px solid #90caf9;
+    }
+    
+    .shift-night {
+        background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+        color: #4a148c;
+        border: 2px solid #ce93d8;
+    }
+    
+    /* Professional Status Indicator */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: statusPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes statusPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(0.9); }
+    }
+    
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+    
+    .status-active::before {
+        background: #10b981;
+    }
+    
+    .status-leave {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+    }
+    
+    .status-leave::before {
+        background: #f59e0b;
+    }
+    
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+    
+    .status-inactive::before {
+        background: #ef4444;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--text-muted);
+    }
+    
+    .empty-state .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+        color: var(--text-muted);
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        letter-spacing: 0.3px;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+    
+    /* Navigation Animation */
+    .sidebar-item {
+        position: relative;
+    }
+    
+    .sidebar-item::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 4px;
+        height: 0;
+        background: var(--accent-primary);
+        transform: translateY(-50%);
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .sidebar-item.active::after,
+    .sidebar-item:hover::after {
+        height: 70%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'drivers' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/drivers" class="nav-tab active">Staff Management</a>
+            <a href="/admin/drivers" class="nav-tab">Schedules</a>
+            <a href="/admin/drivers" class="nav-tab">Reports</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Staff Management</h1>
+            <p class="page-subtitle">Monitor and manage drivers, conductors, and ticket collectors</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-primary-modern" onclick="addStaff()">
+                <i class="fas fa-plus"></i> Add Staff
+            </button>
+        </div>
+    </div>
+    
+    <!-- Metrics Cards -->
+    <div class="row" style="margin-bottom: 24px;">
+        <div class="col-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="totalDrivers">0</div>
+                    <div class="metric-label">Total Drivers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="totalConductors">0</div>
+                    <div class="metric-label">Total Conductors</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="activeStaff">0</div>
+                    <div class="metric-label">Active Today</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="onLeave">0</div>
+                    <div class="metric-label">On Leave</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Staff Tabs -->
+    <div class="staff-tabs">
+        <button class="staff-tab active" onclick="switchTab('drivers')">
+            <i class="fas fa-user-tie"></i> Drivers
+        </button>
+        <button class="staff-tab" onclick="switchTab('conductors')">
+            <i class="fas fa-id-badge"></i> Conductors
+        </button>
+        <button class="staff-tab" onclick="switchTab('all')">
+            <i class="fas fa-users"></i> All Staff
+        </button>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card-modern" style="margin-bottom: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="filterByStatus('all')">
+                    <i class="fas fa-list"></i> All Staff
+                </button>
+                <button class="filter-btn" onclick="filterByStatus('Active')">
+                    <i class="fas fa-check-circle"></i> Active
+                </button>
+                <button class="filter-btn" onclick="filterByStatus('On Leave')">
+                    <i class="fas fa-calendar-times"></i> On Leave
+                </button>
+                <button class="filter-btn" onclick="filterByStatus('Inactive')">
+                    <i class="fas fa-times-circle"></i> Inactive
+                </button>
+            </div>
+            
+            <div class="filter-group">
+                <button class="filter-btn" onclick="filterByShift('Morning')">
+                    <i class="fas fa-sun"></i> Morning
+                </button>
+                <button class="filter-btn" onclick="filterByShift('Evening')">
+                    <i class="fas fa-cloud-sun"></i> Evening
+                </button>
+                <button class="filter-btn" onclick="filterByShift('Night')">
+                    <i class="fas fa-moon"></i> Night
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Drivers Tab Content -->
+    <div id="driversTab" class="staff-tab-content active">
+        <div class="row" id="driversContainer">
+            <!-- Drivers will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Conductors Tab Content -->
+    <div id="conductorsTab" class="staff-tab-content">
+        <div class="row" id="conductorsContainer">
+            <!-- Conductors will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- All Staff Tab Content -->
+    <div id="allTab" class="staff-tab-content">
+        <div class="row" id="allStaffContainer">
+            <!-- All staff will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/drivers.js') }}"></script>
+<script>
+// Debug: Log when page loads
+console.log('Drivers page loaded');
+console.log('Script path:', "{{ url_for('static', filename='js/drivers.js') }}");
+</script>
+{% endblock %}

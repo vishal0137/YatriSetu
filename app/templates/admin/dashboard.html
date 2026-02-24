@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - YatriSetu{% endblock %}
+
+{% block content %}
+{% set active_page = 'dashboard' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin" class="nav-tab active">Overview</a>
+            <a href="/admin" class="nav-tab">Activity</a>
+            <a href="/admin" class="nav-tab">Manage</a>
+            <a href="/admin" class="nav-tab">Reports</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="nav-icon" onclick="showAlert('Help documentation coming soon!', 'info')" style="cursor: pointer;" title="Help">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Good morning, Admin</h1>
+            <p class="page-subtitle">Stay on top of your tasks, monitor progress, and track status.</p>
+        </div>
+    </div>
+    
+    <!-- Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <!-- Total Balance Card -->
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Balance</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalBalance">₹0</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>5% than last month</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Earnings Card (Accent) -->
+        <div class="col-md-3">
+            <div class="metric-card accent">
+                <div class="metric-header">
+                    <span class="metric-label">Total Earnings</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalEarnings">₹0</div>
+                <div class="metric-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>7% This month</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Spending Card -->
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Spending</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalSpending">₹0</div>
+                <div class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>5% This month</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Income Card -->
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Income</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalIncome">₹0</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8% This month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fleet Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Active Buses</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="activeBuses">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-circle" style="color: var(--status-success);"></i>
+                    <span>Live</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Routes</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalRoutes">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Active</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Users</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalUsers">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% growth</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Bookings</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalBookings">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+8% today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activities Table -->
+    <div class="row g-3">
+        <div class="col-md-12">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <h3 class="card-title">Recent Activities</h3>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="search-bar" style="width: 250px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search">
+                        </div>
+                        <button class="btn-icon">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Passenger</th>
+                            <th>Route Details</th>
+                            <th>Category</th>
+                            <th>Fare</th>
+                            <th>Status</th>
+                            <th>Journey Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="activitiesTable">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px;">
+                                <div class="spinner-border" style="color: var(--accent-primary);"></div>
+                                <p style="margin-top: 12px; color: var(--text-muted);">Loading activities...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination-modern" id="paginationContainer">
+                    <!-- Pagination will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load dashboard statistics
+    async function loadStats() {
+        try {
+            const response = await fetch('/admin/api/stats');
+            const result = await response.json();
+            
+            console.log('Stats API Response:', result);
+            
+            if (result.success) {
+                const data = result.data;
+                
+                // Update metrics
+                document.getElementById('activeBuses').textContent = data.active_buses || '0';
+                document.getElementById('totalRoutes').textContent = data.total_routes || '0';
+                document.getElementById('totalUsers').textContent = data.total_users || '0';
+                document.getElementById('totalBookings').textContent = data.total_bookings || '0';
+                
+                // Update financial metrics
+                document.getElementById('totalBalance').textContent = '₹' + (data.total_revenue || 0).toLocaleString('en-IN');
+                document.getElementById('totalEarnings').textContent = '₹' + (data.today_revenue || 0).toLocaleString('en-IN');
+                document.getElementById('totalSpending').textContent = '₹0';
+                document.getElementById('totalIncome').textContent = '₹' + (data.total_revenue || 0).toLocaleString('en-IN');
+                
+                console.log('Stats loaded successfully');
+            } else {
+                console.error('Stats API returned success=false:', result);
+                setDemoData();
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            setDemoData();
+        }
+    }
+    
+    function setDemoData() {
+        console.log('Loading demo data...');
+        document.getElementById('activeBuses').textContent = '134';
+        document.getElementById('totalRoutes').textContent = '165';
+        document.getElementById('totalUsers').textContent = '100';
+        document.getElementById('totalBookings').textContent = '500';
+        document.getElementById('totalBalance').textContent = '₹6,89,372';
+        document.getElementById('totalEarnings').textContent = '₹950';
+        document.getElementById('totalSpending').textContent = '₹700';
+        document.getElementById('totalIncome').textContent = '₹1,050';
+    }
+    
+    // Load recent bookings as activities
+    async function loadActivities() {
+        try {
+            const response = await fetch('/admin/api/bookings/recent');
+            const result = await response.json();
+            
+            console.log('Activities API Response:', result);
+            
+            if (result.success && result.data && result.data.length > 0) {
+                const tbody = document.getElementById('activitiesTable');
+                tbody.innerHTML = '';
+                
+                result.data.forEach((booking, index) => {
+                    const statusClass = {
+                        'confirmed': 'completed',
+                        'pending': 'pending',
+                        'cancelled': 'inactive',
+                        'completed': 'completed'
+                    }[booking.status] || 'pending';
+                    
+                    const statusText = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
+                    
+                    // Format category badge
+                    const categoryBadge = booking.passenger_category === 'General' 
+                        ? '<span style="color: var(--text-muted); font-size: 12px;">General</span>'
+                        : `<span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${booking.passenger_category}</span>`;
+                    
+                    // Format fare
+                    const fareDisplay = booking.fare_amount > 0 
+                        ? `<strong>₹${booking.fare_amount.toFixed(2)}</strong>`
+                        : '<span style="color: var(--text-muted);">Free/Pending</span>';
+                    
+                    // Format journey date
+                    const journeyDate = new Date(booking.journey_date);
+                    const journeyDateStr = journeyDate.toLocaleDateString('en-IN', { 
+                        day: 'numeric', 
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    const journeyTimeStr = journeyDate.toLocaleTimeString('en-IN', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                    
+                    const row = `
+                        <tr>
+                            <td><strong style="color: var(--accent-primary);">${booking.booking_reference}</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user" style="color: var(--accent-primary); font-size: 14px;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 500;">${booking.passenger_name}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-route" style="color: var(--text-muted); font-size: 12px;"></i>
+                                    <span style="font-size: 13px;">${booking.activity_description}</span>
+                                </div>
+                            </td>
+                            <td>${categoryBadge}</td>
+                            <td>${fareDisplay}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div style="font-size: 13px;">
+                                    <div style="font-weight: 500;">${journeyDateStr}</div>
+                                    <div style="color: var(--text-muted); font-size: 12px;">${journeyTimeStr}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn-icon" onclick="viewDetails(${booking.id})" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+                console.log('Activities loaded successfully');
+            } else {
+                console.log('No activities found');
+                const tbody = document.getElementById('activitiesTable');
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">No recent activities</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error loading activities:', error);
+            const tbody = document.getElementById('activitiesTable');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Error loading activities</td></tr>';
+        }
+    }
+    
+    function viewDetails(id) {
+        alert('View details for booking ID: ' + id);
+    }
+    
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard initializing...');
+        loadStats();
+        loadActivities();
+    });
+</script>
+{% endblock %}

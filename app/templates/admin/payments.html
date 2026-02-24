@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Payments Management - YatriSetu{% endblock %}
+{% block content %}
+{% set active_page = 'payments' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/payments" class="nav-tab active">All Payments</a>
+            <a href="/admin/payments" class="nav-tab">Completed</a>
+            <a href="/admin/payments" class="nav-tab">Analytics</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Payments Management</h1>
+            <p class="page-subtitle">Track all payment transactions and revenue</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="refreshPayments()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-primary-modern" onclick="exportPayments()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+    
+    <!-- Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Payments</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalPayments">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-list"></i>
+                    <span>Transactions</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card accent">
+                <div class="metric-header">
+                    <span class="metric-label">Completed</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="completedPayments">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-circle"></i>
+                    <span>Successful</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Revenue</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalRevenue">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+8.5%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Today's Revenue</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="todayRevenue">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12.3%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payments Table -->
+    <div class="card-modern">
+        <div class="card-header-modern">
+            <h3 class="card-title">All Payments</h3>
+            <div style="display: flex; gap: 12px;">
+                <div class="search-bar" style="width: 250px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchFilter" placeholder="Search payments..." oninput="filterPayments()">
+                </div>
+                <select class="form-control-modern" id="statusFilter" onchange="filterPayments()" style="width: 150px;">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <select class="form-control-modern" id="methodFilter" onchange="filterPayments()" style="width: 150px;">
+                    <option value="">All Methods</option>
+                    <option value="wallet">Wallet</option>
+                    <option value="upi">UPI</option>
+                    <option value="card">Card</option>
+                    <option value="netbanking">Net Banking</option>
+                </select>
+                <button class="btn-icon">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Booking Ref</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="paymentsTable">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px;">
+                        <div class="spinner-border" style="color: var(--accent-primary);"></div>
+                        <p style="margin-top: 12px; color: var(--text-muted);">Loading payments...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination-modern" id="paginationContainer"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid #e5e7eb;">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+{% block extra_js %}<script src="/static/js/payments.js"></script>{% endblock %}

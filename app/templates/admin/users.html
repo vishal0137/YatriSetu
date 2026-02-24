@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Users Management - YatriSetu{% endblock %}
+{% block content %}
+{% set active_page = 'users' %}
+{% include 'admin/_sidebar.html' %}
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-tabs-custom">
+            <a href="/admin/users" class="nav-tab active">All Users</a>
+            <a href="/admin/users" class="nav-tab">Active</a>
+            <a href="/admin/users" class="nav-tab">Analytics</a>
+        </div>
+        
+        <div class="nav-actions">
+            <div class="nav-icon" onclick="openSearch()" style="cursor: pointer;" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-icon" onclick="openNotifications()" style="cursor: pointer;" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile" onclick="toggleUserDropdown()" style="cursor: pointer;">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">admin@yatrisetu.com</div>
+                </div>
+                <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Users Management</h1>
+            <p class="page-subtitle">Manage all registered users and permissions</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary-modern" onclick="refreshUsers()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-primary-modern" onclick="addUser()">
+                <i class="fas fa-plus"></i> Add User
+            </button>
+        </div>
+    </div>
+            
+    <!-- Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Total Users</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalUsers">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+5.2%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card accent">
+                <div class="metric-header">
+                    <span class="metric-label">Active Users</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="activeUsers">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-circle"></i>
+                    <span>Online now</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Administrators</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="adminUsers">-</div>
+                <div class="metric-change">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>System access</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-modern">
+                <div class="metric-header">
+                    <span class="metric-label">Passengers</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="passengerUsers">-</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Regular travelers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card-modern">
+        <div class="card-header-modern">
+            <h3 class="card-title">All Users</h3>
+            <div style="display: flex; gap: 12px;">
+                <div class="search-bar" style="width: 250px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchFilter" placeholder="Search users..." oninput="filterUsers()">
+                </div>
+                <select class="form-control-modern" id="roleFilter" onchange="filterUsers()" style="width: 130px;">
+                    <option value="">All Roles</option>
+                    <option value="admin">Admin</option>
+                    <option value="passenger">Passenger</option>
+                </select>
+                <select class="form-control-modern" id="statusFilter" onchange="filterUsers()" style="width: 130px;">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <button class="btn-icon">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px;">
+                        <div class="spinner-border" style="color: var(--accent-primary);"></div>
+                        <p style="margin-top: 12px; color: var(--text-muted);">Loading users...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination-modern" id="paginationContainer"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+        <p style="margin: 0;">&copy; 2026 YatriSetu. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/users.js"></script>
+{% endblock %}
+
