@@ -6,7 +6,7 @@ This document describes the use case diagram for the YatriSetu Smart Transit Pla
 
 ## Diagram
 
-![Use Case Diagram](diagrams/use-case-diagram.png)
+![Use Case Diagram](diagrams/UCD.jpeg)
 
 ## Actors
 
