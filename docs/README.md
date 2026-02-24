@@ -25,7 +25,7 @@ This directory contains comprehensive documentation for the YatriSetu Smart Tran
 | [CHATBOT_CONVERSATIONAL_FLOW.md](CHATBOT_CONVERSATIONAL_FLOW.md) | DMRC-style conversational chatbot implementation |
 | [CHATBOT_QUICK_REFERENCE.md](CHATBOT_QUICK_REFERENCE.md) | Complete chatbot commands and API reference |
 | [ROUTE_FILTERING_FEATURE.md](ROUTE_FILTERING_FEATURE.md) | Context-based route filtering functionality |
-| [LIVE_TRACKING_FEATURE.md](LIVE_TRACKING_FEATURE.md) | Real-time bus tracking system |
+| [LIVE_TRACKING_FEATURE.md](LIVE_TRACKING_FEATURE.md) | Real-time bus tracking system documentation |
 
 ### Design and User Interface
 
