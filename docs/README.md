@@ -17,6 +17,7 @@ This directory contains comprehensive documentation for the YatriSetu Smart Tran
 | Document | Description |
 |----------|-------------|
 | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | Comprehensive overview of codebase organization |
+| [USE_CASE_DIAGRAM.md](USE_CASE_DIAGRAM.md) | System use cases and actor interactions |
 
 ### Feature Documentation
 

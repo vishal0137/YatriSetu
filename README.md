@@ -209,6 +209,7 @@ Comprehensive documentation is available in the `docs/` directory:
 | [QUICKSTART.md](docs/QUICKSTART.md) | Quick setup for experienced developers |
 | [PREREQUISITES.md](docs/PREREQUISITES.md) | System requirements and dependencies |
 | [PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) | Architecture and codebase organization |
+| [USE_CASE_DIAGRAM.md](docs/USE_CASE_DIAGRAM.md) | System use cases and actor interactions |
 | [CHATBOT_QUICK_REFERENCE.md](docs/CHATBOT_QUICK_REFERENCE.md) | Chatbot commands and API reference |
 | [ML_QUICKSTART.md](docs/ML_QUICKSTART.md) | Machine learning implementation guide |
 | [TESTING_GUIDE.md](docs/TESTING_GUIDE.md) | Testing procedures and guidelines |
