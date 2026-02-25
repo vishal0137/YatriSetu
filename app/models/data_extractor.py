@@ -551,13 +551,13 @@ class DataExtractor:
     
     def check_duplicates_in_database(self, category: str) -> Dict:
         """
-        Check for duplicate entries in database
+        Check for duplicate entries in database with detailed comparison
         
         Args:
             category: Data category (buses, routes, fares, stops)
             
         Returns:
-            Dictionary with duplicate information
+            Dictionary with duplicate information including existing data
         """
         if not self.db:
             logger.warning("Database connection not provided, skipping duplicate check")
@@ -578,7 +578,24 @@ class DataExtractor:
                             'field': 'bus_number',
                             'value': bus.get('bus_number'),
                             'existing_id': existing.id,
-                            'action': 'skip'  # Can be 'skip', 'update', or 'replace'
+                            'existing_data': {
+                                'bus_number': existing.bus_number,
+                                'bus_type': existing.bus_type,
+                                'capacity': existing.capacity,
+                                'status': 'Active' if existing.is_active else 'Inactive',
+                                'registration_number': existing.registration_number
+                            },
+                            'new_data': bus,
+                            'differences': self._compare_data(
+                                {
+                                    'bus_number': existing.bus_number,
+                                    'bus_type': existing.bus_type,
+                                    'capacity': str(existing.capacity),
+                                    'status': 'Active' if existing.is_active else 'Inactive'
+                                },
+                                bus
+                            ),
+                            'action': 'skip'
                         })
             
             elif category == 'routes':
@@ -591,28 +608,62 @@ class DataExtractor:
                             'value': route.get('route_number'),
                             'existing_id': existing.id,
                             'existing_data': {
+                                'route_number': existing.route_number,
                                 'route_name': existing.route_name,
                                 'start_location': existing.start_location,
-                                'end_location': existing.end_location
+                                'end_location': existing.end_location,
+                                'distance': str(existing.distance_km) if existing.distance_km else None,
+                                'duration': str(existing.estimated_duration_minutes) if existing.estimated_duration_minutes else None
                             },
+                            'new_data': route,
+                            'differences': self._compare_data(
+                                {
+                                    'route_number': existing.route_number,
+                                    'route_name': existing.route_name,
+                                    'start_location': existing.start_location,
+                                    'end_location': existing.end_location,
+                                    'distance': str(existing.distance_km) if existing.distance_km else None
+                                },
+                                route
+                            ),
                             'action': 'skip'
                         })
             
             elif category == 'stops':
                 for idx, stop in enumerate(data):
-                    existing = Stop.query.filter_by(
-                        route_id=stop.get('route_id'),
-                        stop_name=stop.get('stop_name'),
-                        sequence=stop.get('sequence')
-                    ).first()
-                    if existing:
-                        duplicates.append({
-                            'index': idx,
-                            'field': 'stop_name + sequence',
-                            'value': f"{stop.get('stop_name')} (Seq: {stop.get('sequence')})",
-                            'existing_id': existing.id,
-                            'action': 'skip'
-                        })
+                    # Try to find route by route_number
+                    route = Route.query.filter_by(route_number=stop.get('route_id')).first()
+                    if route:
+                        existing = Stop.query.filter_by(
+                            route_id=route.id,
+                            stop_name=stop.get('stop_name'),
+                            stop_order=int(stop.get('sequence', 0))
+                        ).first()
+                        if existing:
+                            duplicates.append({
+                                'index': idx,
+                                'field': 'stop_name + sequence',
+                                'value': f"{stop.get('stop_name')} (Seq: {stop.get('sequence')})",
+                                'existing_id': existing.id,
+                                'existing_data': {
+                                    'stop_name': existing.stop_name,
+                                    'sequence': str(existing.stop_order),
+                                    'route_id': stop.get('route_id'),
+                                    'latitude': str(existing.latitude) if existing.latitude else None,
+                                    'longitude': str(existing.longitude) if existing.longitude else None
+                                },
+                                'new_data': stop,
+                                'differences': self._compare_data(
+                                    {
+                                        'stop_name': existing.stop_name,
+                                        'sequence': str(existing.stop_order),
+                                        'latitude': str(existing.latitude) if existing.latitude else None,
+                                        'longitude': str(existing.longitude) if existing.longitude else None
+                                    },
+                                    stop
+                                ),
+                                'action': 'skip'
+                            })
             
             self.duplicate_checks = duplicates
             logger.info(f"Found {len(duplicates)} potential duplicates in {category}")
@@ -624,6 +675,33 @@ class DataExtractor:
             'duplicates': duplicates,
             'total_duplicates': len(duplicates)
         }
+    
+    def _compare_data(self, existing: Dict, new: Dict) -> List[Dict]:
+        """
+        Compare existing and new data to find differences
+        
+        Args:
+            existing: Existing data from database
+            new: New data from file
+            
+        Returns:
+            List of differences
+        """
+        differences = []
+        
+        for key in existing.keys():
+            existing_value = str(existing.get(key, '')).strip() if existing.get(key) else ''
+            new_value = str(new.get(key, '')).strip() if new.get(key) else ''
+            
+            if existing_value != new_value:
+                differences.append({
+                    'field': key,
+                    'existing_value': existing_value or 'Not set',
+                    'new_value': new_value or 'Not set',
+                    'changed': True
+                })
+        
+        return differences
     
     def get_preview_data(self, category: str, limit: int = 100) -> List[Dict]:
         """

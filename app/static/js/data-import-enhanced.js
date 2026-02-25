@@ -195,6 +195,11 @@ function buildPreviewTable(data) {
             th.textContent = col.replace(/_/g, ' ').toUpperCase();
             thead.appendChild(th);
         });
+        // Add duplicate info column
+        const thDup = document.createElement('th');
+        thDup.textContent = 'DUPLICATE INFO';
+        thDup.style.width = '200px';
+        thead.appendChild(thDup);
     }
     
     // Build rows
@@ -227,10 +232,16 @@ function buildPreviewTable(data) {
         tdAction.appendChild(actionSelect);
         tr.appendChild(tdAction);
         
-        // Status badge
+        // Status badge with tooltip
         const tdStatus = document.createElement('td');
         if (record.is_duplicate) {
-            tdStatus.innerHTML = '<span class="badge bg-warning">Duplicate</span>';
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-warning';
+            badge.textContent = 'Duplicate';
+            badge.style.cursor = 'pointer';
+            badge.title = 'Click to view details';
+            badge.onclick = () => showDuplicateDetails(record);
+            tdStatus.appendChild(badge);
         } else {
             tdStatus.innerHTML = '<span class="badge bg-success">New</span>';
         }
@@ -240,14 +251,160 @@ function buildPreviewTable(data) {
         columns.forEach(col => {
             const td = document.createElement('td');
             td.className = 'editable-cell';
+            
+            // Highlight changed fields for duplicates
+            if (record.is_duplicate && record.duplicate_info && record.duplicate_info.differences) {
+                const diff = record.duplicate_info.differences.find(d => d.field === col);
+                if (diff && diff.changed) {
+                    td.style.backgroundColor = '#fff3cd';
+                    td.style.fontWeight = 'bold';
+                    td.title = `Existing: ${diff.existing_value}\nNew: ${diff.new_value}`;
+                }
+            }
+            
             td.textContent = record.data[col] || '-';
             td.dataset.column = col;
             td.onclick = () => editCell(td, record.id, col);
             tr.appendChild(td);
         });
         
+        // Duplicate info column
+        const tdDupInfo = document.createElement('td');
+        if (record.is_duplicate && record.duplicate_info) {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-warning';
+            btn.innerHTML = '<i class="fas fa-info-circle"></i> View Details';
+            btn.onclick = () => showDuplicateDetails(record);
+            tdDupInfo.appendChild(btn);
+        } else {
+            tdDupInfo.textContent = '-';
+        }
+        tr.appendChild(tdDupInfo);
+        
         tbody.appendChild(tr);
     });
+}
+
+function showDuplicateDetails(record) {
+    if (!record.is_duplicate || !record.duplicate_info) return;
+    
+    const dupInfo = record.duplicate_info;
+    
+    // Build differences table
+    let differencesHtml = '';
+    if (dupInfo.differences && dupInfo.differences.length > 0) {
+        differencesHtml = `
+            <h6 class="mt-3">Field Differences:</h6>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Existing Value</th>
+                        <th>New Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${dupInfo.differences.map(diff => `
+                        <tr>
+                            <td><strong>${diff.field.replace(/_/g, ' ')}</strong></td>
+                            <td>${diff.existing_value}</td>
+                            <td style="background-color: #fff3cd;">${diff.new_value}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    } else {
+        differencesHtml = '<p class="text-success mt-3"><i class="fas fa-check"></i> No differences found - data is identical</p>';
+    }
+    
+    // Build existing data display
+    let existingDataHtml = '';
+    if (dupInfo.existing_data) {
+        existingDataHtml = `
+            <h6 class="mt-3">Existing Database Record:</h6>
+            <div class="alert alert-info">
+                ${Object.entries(dupInfo.existing_data).map(([key, value]) => `
+                    <div><strong>${key.replace(/_/g, ' ')}:</strong> ${value || 'Not set'}</div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    const modalHtml = `
+        <div class="modal fade" id="duplicateModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle"></i> Duplicate Entry Details
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <strong>Duplicate Field:</strong> ${dupInfo.field}<br>
+                            <strong>Value:</strong> ${dupInfo.value}<br>
+                            <strong>Database ID:</strong> ${dupInfo.existing_id}
+                        </div>
+                        
+                        ${existingDataHtml}
+                        ${differencesHtml}
+                        
+                        <h6 class="mt-3">Recommended Actions:</h6>
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <strong>Skip:</strong> Don't import this record (keep existing data)
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Update:</strong> Update existing record with new values
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Insert:</strong> Force insert (may cause database error)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-warning" onclick="setRecordAction(${record.id}, 'skip')" data-bs-dismiss="modal">
+                            Skip This Record
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="setRecordAction(${record.id}, 'update')" data-bs-dismiss="modal">
+                            Update Existing
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('duplicateModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+    modal.show();
+}
+
+function setRecordAction(recordId, action) {
+    updateRecordAction(recordId, action);
+    
+    // Update the dropdown in the table
+    const row = document.querySelector(`tr[data-record-id="${recordId}"]`);
+    if (row) {
+        const select = row.querySelector('select');
+        if (select) {
+            select.value = action;
+        }
+    }
+    
+    showAlert('success', `Action set to "${action}" for record #${recordId + 1}`);
 }
 
 function editCell(cell, recordId, column) {
