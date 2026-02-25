@@ -96,11 +96,22 @@ YatriSetu_Prototype/
 ├── docs/                      # Documentation
 ├── ml/                        # Machine learning models
 ├── tests/                     # Test suite
-├── processed_data/            # Finalized CSV files ready for import
-├── process_dtc_data.py       # CLI tool for data processing
-├── requirements.txt           # Python dependencies
+├── data/                      # Data files
+│   ├── raw/                  # Raw input files (PDFs, CSVs)
+│   └── processed/            # Processed CSV files ready for import
+├── logs/                      # Application logs
+├── scripts/                   # Utility scripts
+│   ├── setup.bat            # Setup script
+│   ├── start_server.bat     # Server start script
+│   └── process_dtc_data.py  # CLI tool for data processing
+├── uploads/                   # User uploaded files
+│   └── data_imports/         # Data import uploads
+├── .env                       # Environment variables
+├── .gitignore                # Git ignore rules
 ├── config.py                  # Configuration file
-└── run.py                     # Application entry point
+├── requirements.txt           # Python dependencies
+├── run.py                     # Application entry point
+└── README.md                  # Main documentation
 ```
 
 ## Technology Stack

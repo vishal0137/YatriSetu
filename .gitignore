@@ -51,3 +51,25 @@ instance/
 
 # Logs
 *.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Uploads
+uploads/
+!uploads/.gitkeep
+
+# Data
+data/raw/*.pdf
+data/raw/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+~*

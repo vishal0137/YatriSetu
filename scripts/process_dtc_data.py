@@ -7,6 +7,10 @@ import sys
 import os
 import argparse
 from datetime import datetime
+
+# Add project root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app.models.unified_data_processor import UnifiedDataProcessor
 
 

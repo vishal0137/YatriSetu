@@ -4,6 +4,12 @@
 
 This directory contains finalized, database-ready CSV files processed through the Unified Data Processor. All data has been extracted from PDF, cleaned, validated, and aligned with the YatriSetu database schema.
 
+## Location
+
+This folder is located at: `data/processed/`
+
+Raw input files are stored in: `data/raw/`
+
 ## Processing Pipeline
 
 ```
@@ -176,7 +182,7 @@ DELIMITER ',' CSV HEADER;
 Generated using: **Unified Data Processor**
 
 ```bash
-python process_dtc_data.py destination_bus_services_nov_2025_1_0.pdf processed_data
+python scripts/process_dtc_data.py data/raw/destination_bus_services_nov_2025_1_0.pdf data/processed
 ```
 
 ## Features
@@ -196,7 +202,7 @@ When new DTC data is available:
 
 ```bash
 # Process new PDF
-python process_dtc_data.py new_dtc_data.pdf processed_data
+python scripts/process_dtc_data.py data/raw/new_dtc_data.pdf data/processed
 
 # Review generated files
 # Import via admin panel or database
