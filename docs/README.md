@@ -27,6 +27,7 @@ This directory contains comprehensive documentation for the YatriSetu Smart Tran
 | [CHATBOT_QUICK_REFERENCE.md](CHATBOT_QUICK_REFERENCE.md) | Complete chatbot commands and API reference |
 | [ROUTE_FILTERING_FEATURE.md](ROUTE_FILTERING_FEATURE.md) | Context-based route filtering functionality |
 | [LIVE_TRACKING_FEATURE.md](LIVE_TRACKING_FEATURE.md) | Real-time bus tracking system documentation |
+| [DATA_IMPORT_FEATURE.md](DATA_IMPORT_FEATURE.md) | Data import from CSV/PDF files |
 
 ### Design and User Interface
 

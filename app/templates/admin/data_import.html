@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Data Import - YatriSetu Admin{% endblock %}
+
+{% block content %}
+{% set active_page = 'data_import' %}
+{% include 'admin/_sidebar.html' %}
+
+<div class="main-content">
+    <div class="content-header">
+        <h1><i class="fas fa-file-import"></i> Data Import</h1>
+        <p>Import buses, routes, fares, and stops data from CSV or PDF files</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-upload"></i> Upload File</h5>
+        </div>
+        <div class="card-body">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                <h5>Drag and drop file here or click to browse</h5>
+                <p class="text-muted">Supported formats: CSV, PDF (Max size: 10MB)</p>
+                <input type="file" id="fileInput" accept=".csv,.pdf" style="display: none;">
+                <button class="btn btn-primary mt-3" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+            </div>
+            
+            <div id="fileInfo" class="mt-3" style="display: none;">
+                <div class="alert alert-info">
+                    <strong>Selected File:</strong> <span id="fileName"></span>
+                    <button class="btn btn-sm btn-danger float-end" onclick="clearFile()">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Section -->
+    <div class="card mb-4" id="analysisSection" style="display: none;">
+        <div class="card-header">
+            <h5><i class="fas fa-chart-bar"></i> File Analysis</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRows">-</div>
+                        <div class="stat-label">Total Rows</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalColumns">-</div>
+                        <div class="stat-label">Total Columns</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value" id="detectedCategory">-</div>
+                        <div class="stat-label">Detected Category</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value" id="confidence">-</div>
+                        <div class="stat-label">Confidence</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h6>Detected Columns:</h6>
+                <div id="columnsList" class="badge-container"></div>
+            </div>
+
+            <div class="mt-4">
+                <h6>Sample Data (First 3 rows):</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="sampleDataTable">
+                        <thead id="sampleTableHead"></thead>
+                        <tbody id="sampleTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label for="categorySelect" class="form-label">Select Data Category:</label>
+                <select class="form-select" id="categorySelect">
+                    <option value="">-- Select Category --</option>
+                    <option value="buses">Buses</option>
+                    <option value="routes">Routes</option>
+                    <option value="fares">Fares</option>
+                    <option value="stops">Stops</option>
+                </select>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-primary" onclick="extractData()">
+                    <i class="fas fa-cogs"></i> Extract Data
+                </button>
+                <button class="btn btn-secondary" onclick="validateData()">
+                    <i class="fas fa-check-circle"></i> Validate Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extraction Results -->
+    <div class="card mb-4" id="extractionSection" style="display: none;">
+        <div class="card-header">
+            <h5><i class="fas fa-database"></i> Extraction Results</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success" id="extractionSuccess" style="display: none;">
+                <strong>Success!</strong> <span id="extractionMessage"></span>
+            </div>
+
+            <div class="alert alert-warning" id="validationWarnings" style="display: none;">
+                <strong>Validation Warnings:</strong>
+                <ul id="validationErrorsList"></ul>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped" id="extractedDataTable">
+                    <thead id="extractedTableHead"></thead>
+                    <tbody id="extractedTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-success" onclick="importToDatabase()">
+                    <i class="fas fa-database"></i> Import to Database
+                </button>
+                <button class="btn btn-info" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export to CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #FF6B4A;
+    background-color: #f8f9fa;
+}
+
+.upload-area.dragover {
+    border-color: #FF6B4A;
+    background-color: #fff5f2;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.badge-container .badge {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/data-import.js') }}"></script>
+{% endblock %}

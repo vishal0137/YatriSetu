@@ -1,0 +1,41 @@
+route_number,route_name,start_location,end_location,intermediate_stops,morning_departure,evening_departure,bus_type,status
+DS-1,Dwarka Sector-6/7 X- ing to Nehru Place(T),Dwarka Sector-6/7 X- ing,Nehru Place(T),"Telephone Exchange Dwarka Sec-6, Dwarka Sec-1/7, Dwarka Gate",8.20,18.05,AC,Active
+DS-2,Dwarka Sec-4/5 Xing (Ashirwad Chowk) to CGO Complex (JLN Stadium),Dwarka Sec-4/5 Xing (Ashirwad Chowk),CGO Complex (JLN Stadium),"MadhuVihar,DwarkaSec.-2/6X-ing,J.M.International School",8.15,18.05,AC,Active
+DS-3,Dwarka Sector-19 (Pocket-2) to Shastri Bhawan,Dwarka Sector-19 (Pocket-2),Shastri Bhawan,"Dwarka Sec-19/20 X-ing, NHAI Building, Dwarka Court",8.05,18.05,AC,Active
+DS-4,DwarkaSector-14(LIG Flat) to Connaught Place (Shivaji Stadium),DwarkaSector-14(LIG Flat),Connaught Place (Shivaji Stadium),"Dwarka Sec-13/14 X-ing, Dwarka Sec-3/13 X-ing, Dwarka Sec-3/4 X-ing",8.20,18.05,AC,Active
+DS-5,Rohini Sec-22 to Nehru Place(T),Rohini Sec-22,Nehru Place(T),"Rohini Sec.-21, Rohini Sec-20/21 X-ing, Pooth Kalan",7.55,18.05,AC,Active
+DS-6,Rohini Sec-16 to CGO Complex (JLN Stadium),Rohini Sec-16,CGO Complex (JLN Stadium),"Rohini Sec-17, Rohini Sec-11, Rohini Depot-2",8.00,18.05,AC,Active
+DS-7,Rohini Sec-23 to Shastri Bhawan,Rohini Sec-23,Shastri Bhawan,"RohiniSec.-23Pkt-3,RohiniSec-23Pkt-2,RohiniSec- 23 Pkt.-1",8.00,18.05,AC,Active
+DS-8,Rohini(Avantika) to Connaught Place (Shivaji Stadium),Rohini(Avantika),Connaught Place (Shivaji Stadium),"Avantika X-ing, West Enclave, Keshav Maha Vidyalaya",8.25,18.05,AC,Active
+DS-9,Badarpur Border to Nehru Place(T),Badarpur Border,Nehru Place(T),"Rajiv Gandhi Stadium, Prehlad Pur, Suraj Kund X-ing",8.50,18.05,AC,Active
+DS-10,Badarpur Border to Krishi Bhawan,Badarpur Border,Krishi Bhawan,"Jait Pur X-ing, Badar Pur, Power House Badar Pur",8.15,18.05,AC,Active
+DS-11,Badarpur Border to CGO Complex (JLN Stadium,Badarpur Border,CGO Complex (JLN Stadium,"Jait Pur X-ing, Badar Pur, Power House Badar Pur",8.35,18.05,AC,Active
+DS-12,Badarpur Border to Connaught Place(Shivaji Stadium),Badarpur Border,Connaught Place(Shivaji Stadium),"Jait Pur X-ing, Badar Pur, Power House Badar Pur",8.20,18.05,AC,Active
+DS-13,Janak Puri B-2 to Nehru Place(T),Janak Puri B-2,Nehru Place(T),"SarvodyaKanyaVidyalaya,DistrictPark,BhartiMahila College",8.15,18.05,AC,Active
+DS-14,Janak Puri A-1 to CGO Complex (JLN Stadium),Janak Puri A-1,CGO Complex (JLN Stadium),"Tilak Pul, Jewan Park, C-1 Janak Puri",8.15,18.05,AC,Active
+DS-15,Janak Puri C-1 to Shastri Bhawan,Janak Puri C-1,Shastri Bhawan,"C-2 Janak Puri (Punkha Road), Dabri X-ing, Janak Cinema",8.35,18.05,AC,Active
+DS-16,Janak Puri C-2 to Connaught Place (Shivaji Stadium),Janak Puri C-2,Connaught Place (Shivaji Stadium),"C-2B Janak Puri, Bharti Mahila College, Virender Nagar",8.40,18.05,AC,Active
+DS-17,I P Extantion (Balco Apartment) to Nehru Place(T),I P Extantion (Balco Apartment),Nehru Place(T),"Vijya Laxmi Apartment, Parivar Apartment, Ras Vihar",8.15,18.05,AC,Active
+DS-18,I P Extantion j(Balco Apartment) to CGO Complex (JLN Stadium),I P Extantion j(Balco Apartment),CGO Complex (JLN Stadium),"Vijya Laxmi Apartment, Parivar Apartment, Ras Vihar",8.20,18.05,AC,Active
+DS-19,I P Extantion (Balco Apartment) to Shastri Bhawan,I P Extantion (Balco Apartment),Shastri Bhawan,"Vijya Laxmi Apartment, Parivar Apartment, Ras Vihar",8.30,18.05,AC,Active
+DS-20,I P Extantion (Balco Apartment) to Connaught Place (Shivaji Stadium),I P Extantion (Balco Apartment),Connaught Place (Shivaji Stadium),"Vijya Laxmi Apartment, Parivar Apartment, Ras Vihar",8.35,18.05,AC,Active
+DS-21,Dwarka Sec-23 Near Harmoni Apartment to Krishi Bhawam,Dwarka Sec-23 Near Harmoni Apartment,Krishi Bhawam,"Dwarka Sec- 22/23 X-ing, Dwarka Sec.-20/21 X-ing, Dwaka Sec-8 Metro Station",8.20,18.05,AC,Active
+DS-22,Dwarka Sec-19 Pkt-3 (DTC Bus Stand) to Nehru Place,Dwarka Sec-19 Pkt-3 (DTC Bus Stand),Nehru Place,"DwarkaSec-10/11,PartibhaSchool,DwarkaSec-6/10, 5/11 X-ing",8.15,18.05,AC,Active
+DS-23,Dwarka Sec-8 (Depot Gate) to JLN Stadium,Dwarka Sec-8 (Depot Gate),JLN Stadium,"Royal Residency,Dwarka Sec-6/7,9/10 Xing, Princes Park Sec-7",8.00,18.05,AC,Active
+DS-24,Dwarka Sec-3 (Madhu vihar) to Shivaji Stadium,Dwarka Sec-3 (Madhu vihar),Shivaji Stadium,"Dwarka Sec.-2/6 X-ing, J.M. International School, Dwarka Sec-1 / Mahalaxmi Apartment",8.25,18.05,AC,Active
+DS-25,Dwarka Sec-16 Pkt-C (GGS University) to Kend. Terminal,Dwarka Sec-16 Pkt-C (GGS University),Kend. Terminal,"Dwarka Sec.-17D/18 Corner, Dwarka Sec-3/4 X-ing, Matiala X-ing",8.25,18.05,AC,Active
+DS-26,Janak Puri C-2B to JLN Stadium,Janak Puri C-2B,JLN Stadium,"C-4E Janak Puri, C-3 Janak Puri, C-4H Janak Puri",8.20,18.05,AC,Active
+DS-27,Janak Puri D-Block to Shivaji Stadium,Janak Puri D-Block,Shivaji Stadium,"Sagar Pur Flyover, Old Nangal Raya, Kirby Place",8.15,18.05,AC,Active
+DS-28,janak Puri B-I Terminal to Nehru Place,janak Puri B-I Terminal,Nehru Place,"B-2 Janak Puri, Sarvodya Kanya Vidyalaya, District Park,",8.25,18.05,AC,Active
+DS-29,Janak Puri C-4 H to Krishi Bhawan,Janak Puri C-4 H,Krishi Bhawan,"C-5AJanakPuri,DESUColony,SagarPur/Vashistha Park",8.25,18.05,AC,Active
+DS-30,Janak Puri A-3 (Near Mota Singh School) to Kend. Terminal,Janak Puri A-3 (Near Mota Singh School),Kend. Terminal,"A-5B Janak Puri, C-2 Janak Puri, C-2B Janak Puri,",8.40,18.05,AC,Active
+DS-31,Rohini Sec-13 (Sachdeva Pub. School) to Krishi Bhawam,Rohini Sec-13 (Sachdeva Pub. School),Krishi Bhawam,"Goodwill Apartment, Parshant Vihar, Uttri Pitam Pura",8.15,18.05,AC,Active
+DS-32,Avantika (Rohini Sector-1) to Nehru Place,Avantika (Rohini Sector-1),Nehru Place,"Avantika X-ing, Mangol Pur Kalan, Mangol Pur school",8.00,18.05,AC,Active
+DS-33,Rohini Sec-11 SFS Flats to JLN Stadium,Rohini Sec-11 SFS Flats,JLN Stadium,"Rohini Sec-11 H-Blk., Rohini Sec-11 F-Blk., Rithala Metro Station",8.00,18.05,AC,Active
+DS-34,Rohini Sec-18 (Near Telephone Exchange) to Shivaji Stadium,Rohini Sec-18 (Near Telephone Exchange),Shivaji Stadium,"Rohini Sec-18 Police Chowki, Badli School, Badli X-ing",8.10,18.05,AC,Active
+DS-35,Rohini Sec-27 (DTC Bus Stand) to Kend. Terminal,Rohini Sec-27 (DTC Bus Stand),Kend. Terminal,"Rohini Sec-28, Shahbad Dairy, A-Blk. Shahbad Dairy",8.15,18.05,AC,Active
+DS-36,I P Extantion (Madhu vihar) to Krishi Bhawan,I P Extantion (Madhu vihar),Krishi Bhawan,"Karkari More, New Rajdhani Encalve, Swasthya Vihar",8.55,18.05,AC,Active
+DS-37,I P Extantion (Madhu vihar) to Nehru Place,I P Extantion (Madhu vihar),Nehru Place,"Ashirwad Apartment, Chander Vihar, Mandawali",8.45,18.05,AC,Active
+DS-38,I P Extantion (Madhu vihar) to JLN Stadium,I P Extantion (Madhu vihar),JLN Stadium,"Karkari More, New Rajdhani Encalve, Swasthya Vihar",8.50,18.05,AC,Active
+DS-39,I P Extantion (Madhu vihar) to Shivaji Stadium,I P Extantion (Madhu vihar),Shivaji Stadium,"Karkari More, New Rajdhani Encalve, Swasthya Vihar",8.55,18.05,AC,Active
+DS-40,I P Extantion (Madhu vihar) to Kend. Terminal,I P Extantion (Madhu vihar),Kend. Terminal,"Karkari More, New Rajdhani Encalve, Swasthya Vihar",8.50,18.05,AC,Active

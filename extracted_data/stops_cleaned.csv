@@ -1,0 +1,205 @@
+route_id,stop_name,sequence,stop_type
+DS-1,Dwarka Sector-6/7 X- ing,1,Origin
+DS-1,Telephone Exchange Dwarka Sec-6,2,Intermediate
+DS-1,Dwarka Sec-1/7,3,Intermediate
+DS-1,Dwarka Gate,4,Intermediate
+DS-1,Nehru Place(T),6,Destination
+DS-2,Dwarka Sec-4/5 Xing (Ashirwad Chowk),1,Origin
+DS-2,MadhuVihar,2,Intermediate
+DS-2,DwarkaSec.-2/6X-ing,3,Intermediate
+DS-2,J.M.International School,4,Intermediate
+DS-2,CGO Complex (JLN Stadium),11,Destination
+DS-3,Dwarka Sector-19 (Pocket-2),1,Origin
+DS-3,Dwarka Sec-19/20 X-ing,2,Intermediate
+DS-3,NHAI Building,3,Intermediate
+DS-3,Dwarka Court,4,Intermediate
+DS-3,Shastri Bhawan,16,Destination
+DS-4,DwarkaSector-14(LIG Flat),1,Origin
+DS-4,Dwarka Sec-13/14 X-ing,2,Intermediate
+DS-4,Dwarka Sec-3/13 X-ing,3,Intermediate
+DS-4,Dwarka Sec-3/4 X-ing,4,Intermediate
+DS-4,Connaught Place (Shivaji Stadium),21,Destination
+DS-5,Rohini Sec-22,1,Origin
+DS-5,Rohini Sec.-21,2,Intermediate
+DS-5,Rohini Sec-20/21 X-ing,3,Intermediate
+DS-5,Pooth Kalan,4,Intermediate
+DS-5,Nehru Place(T),26,Destination
+DS-6,Rohini Sec-16,1,Origin
+DS-6,Rohini Sec-17,2,Intermediate
+DS-6,Rohini Sec-11,3,Intermediate
+DS-6,Rohini Depot-2,4,Intermediate
+DS-6,CGO Complex (JLN Stadium),31,Destination
+DS-7,Rohini Sec-23,1,Origin
+DS-7,RohiniSec.-23Pkt-3,2,Intermediate
+DS-7,RohiniSec-23Pkt-2,3,Intermediate
+DS-7,RohiniSec- 23 Pkt.-1,4,Intermediate
+DS-7,Shastri Bhawan,36,Destination
+DS-8,Rohini(Avantika),1,Origin
+DS-8,Avantika X-ing,2,Intermediate
+DS-8,West Enclave,3,Intermediate
+DS-8,Keshav Maha Vidyalaya,4,Intermediate
+DS-8,Connaught Place (Shivaji Stadium),41,Destination
+DS-9,Badarpur Border,1,Origin
+DS-9,Rajiv Gandhi Stadium,2,Intermediate
+DS-9,Prehlad Pur,3,Intermediate
+DS-9,Suraj Kund X-ing,4,Intermediate
+DS-9,Nehru Place(T),46,Destination
+DS-10,Badarpur Border,1,Origin
+DS-10,Jait Pur X-ing,2,Intermediate
+DS-10,Badar Pur,3,Intermediate
+DS-10,Power House Badar Pur,4,Intermediate
+DS-10,Krishi Bhawan,51,Destination
+DS-11,Badarpur Border,1,Origin
+DS-11,Jait Pur X-ing,2,Intermediate
+DS-11,Badar Pur,3,Intermediate
+DS-11,Power House Badar Pur,4,Intermediate
+DS-11,CGO Complex (JLN Stadium,56,Destination
+DS-12,Badarpur Border,1,Origin
+DS-12,Jait Pur X-ing,2,Intermediate
+DS-12,Badar Pur,3,Intermediate
+DS-12,Power House Badar Pur,4,Intermediate
+DS-12,Connaught Place(Shivaji Stadium),61,Destination
+DS-13,Janak Puri B-2,1,Origin
+DS-13,SarvodyaKanyaVidyalaya,2,Intermediate
+DS-13,DistrictPark,3,Intermediate
+DS-13,BhartiMahila College,4,Intermediate
+DS-13,Nehru Place(T),66,Destination
+DS-14,Janak Puri A-1,1,Origin
+DS-14,Tilak Pul,2,Intermediate
+DS-14,Jewan Park,3,Intermediate
+DS-14,C-1 Janak Puri,4,Intermediate
+DS-14,CGO Complex (JLN Stadium),71,Destination
+DS-15,Janak Puri C-1,1,Origin
+DS-15,C-2 Janak Puri (Punkha Road),2,Intermediate
+DS-15,Dabri X-ing,3,Intermediate
+DS-15,Janak Cinema,4,Intermediate
+DS-15,Shastri Bhawan,76,Destination
+DS-16,Janak Puri C-2,1,Origin
+DS-16,C-2B Janak Puri,2,Intermediate
+DS-16,Bharti Mahila College,3,Intermediate
+DS-16,Virender Nagar,4,Intermediate
+DS-16,Connaught Place (Shivaji Stadium),81,Destination
+DS-17,I P Extantion (Balco Apartment),1,Origin
+DS-17,Vijya Laxmi Apartment,2,Intermediate
+DS-17,Parivar Apartment,3,Intermediate
+DS-17,Ras Vihar,4,Intermediate
+DS-17,Nehru Place(T),86,Destination
+DS-18,I P Extantion j(Balco Apartment),1,Origin
+DS-18,Vijya Laxmi Apartment,2,Intermediate
+DS-18,Parivar Apartment,3,Intermediate
+DS-18,Ras Vihar,4,Intermediate
+DS-18,CGO Complex (JLN Stadium),91,Destination
+DS-19,I P Extantion (Balco Apartment),1,Origin
+DS-19,Vijya Laxmi Apartment,2,Intermediate
+DS-19,Parivar Apartment,3,Intermediate
+DS-19,Ras Vihar,4,Intermediate
+DS-19,Shastri Bhawan,96,Destination
+DS-20,I P Extantion (Balco Apartment),1,Origin
+DS-20,Vijya Laxmi Apartment,2,Intermediate
+DS-20,Parivar Apartment,3,Intermediate
+DS-20,Ras Vihar,4,Intermediate
+DS-20,Connaught Place (Shivaji Stadium),101,Destination
+DS-21,Dwarka Sec-23 Near Harmoni Apartment,1,Origin
+DS-21,Dwarka Sec- 22/23 X-ing,2,Intermediate
+DS-21,Dwarka Sec.-20/21 X-ing,3,Intermediate
+DS-21,Dwaka Sec-8 Metro Station,4,Intermediate
+DS-21,Krishi Bhawam,106,Destination
+DS-22,Dwarka Sec-19 Pkt-3 (DTC Bus Stand),1,Origin
+DS-22,DwarkaSec-10/11,2,Intermediate
+DS-22,PartibhaSchool,3,Intermediate
+DS-22,DwarkaSec-6/10,4,Intermediate
+DS-22,5/11 X-ing,5,Intermediate
+DS-22,Nehru Place,112,Destination
+DS-23,Dwarka Sec-8 (Depot Gate),1,Origin
+DS-23,Royal Residency,2,Intermediate
+DS-23,Dwarka Sec-6/7,3,Intermediate
+DS-23,9/10 Xing,4,Intermediate
+DS-23,Princes Park Sec-7,5,Intermediate
+DS-23,JLN Stadium,118,Destination
+DS-24,Dwarka Sec-3 (Madhu vihar),1,Origin
+DS-24,Dwarka Sec.-2/6 X-ing,2,Intermediate
+DS-24,J.M. International School,3,Intermediate
+DS-24,Dwarka Sec-1 / Mahalaxmi Apartment,4,Intermediate
+DS-24,Shivaji Stadium,123,Destination
+DS-25,Dwarka Sec-16 Pkt-C (GGS University),1,Origin
+DS-25,Dwarka Sec.-17D/18 Corner,2,Intermediate
+DS-25,Dwarka Sec-3/4 X-ing,3,Intermediate
+DS-25,Matiala X-ing,4,Intermediate
+DS-25,Kend. Terminal,128,Destination
+DS-26,Janak Puri C-2B,1,Origin
+DS-26,C-4E Janak Puri,2,Intermediate
+DS-26,C-3 Janak Puri,3,Intermediate
+DS-26,C-4H Janak Puri,4,Intermediate
+DS-26,JLN Stadium,133,Destination
+DS-27,Janak Puri D-Block,1,Origin
+DS-27,Sagar Pur Flyover,2,Intermediate
+DS-27,Old Nangal Raya,3,Intermediate
+DS-27,Kirby Place,4,Intermediate
+DS-27,Shivaji Stadium,138,Destination
+DS-28,janak Puri B-I Terminal,1,Origin
+DS-28,B-2 Janak Puri,2,Intermediate
+DS-28,Sarvodya Kanya Vidyalaya,3,Intermediate
+DS-28,District Park,4,Intermediate
+DS-28,,5,Intermediate
+DS-28,Nehru Place,144,Destination
+DS-29,Janak Puri C-4 H,1,Origin
+DS-29,C-5AJanakPuri,2,Intermediate
+DS-29,DESUColony,3,Intermediate
+DS-29,SagarPur/Vashistha Park,4,Intermediate
+DS-29,Krishi Bhawan,149,Destination
+DS-30,Janak Puri A-3 (Near Mota Singh School),1,Origin
+DS-30,A-5B Janak Puri,2,Intermediate
+DS-30,C-2 Janak Puri,3,Intermediate
+DS-30,C-2B Janak Puri,4,Intermediate
+DS-30,,5,Intermediate
+DS-30,Kend. Terminal,155,Destination
+DS-31,Rohini Sec-13 (Sachdeva Pub. School),1,Origin
+DS-31,Goodwill Apartment,2,Intermediate
+DS-31,Parshant Vihar,3,Intermediate
+DS-31,Uttri Pitam Pura,4,Intermediate
+DS-31,Krishi Bhawam,160,Destination
+DS-32,Avantika (Rohini Sector-1),1,Origin
+DS-32,Avantika X-ing,2,Intermediate
+DS-32,Mangol Pur Kalan,3,Intermediate
+DS-32,Mangol Pur school,4,Intermediate
+DS-32,Nehru Place,165,Destination
+DS-33,Rohini Sec-11 SFS Flats,1,Origin
+DS-33,Rohini Sec-11 H-Blk.,2,Intermediate
+DS-33,Rohini Sec-11 F-Blk.,3,Intermediate
+DS-33,Rithala Metro Station,4,Intermediate
+DS-33,JLN Stadium,170,Destination
+DS-34,Rohini Sec-18 (Near Telephone Exchange),1,Origin
+DS-34,Rohini Sec-18 Police Chowki,2,Intermediate
+DS-34,Badli School,3,Intermediate
+DS-34,Badli X-ing,4,Intermediate
+DS-34,Shivaji Stadium,175,Destination
+DS-35,Rohini Sec-27 (DTC Bus Stand),1,Origin
+DS-35,Rohini Sec-28,2,Intermediate
+DS-35,Shahbad Dairy,3,Intermediate
+DS-35,A-Blk. Shahbad Dairy,4,Intermediate
+DS-35,Kend. Terminal,180,Destination
+DS-36,I P Extantion (Madhu vihar),1,Origin
+DS-36,Karkari More,2,Intermediate
+DS-36,New Rajdhani Encalve,3,Intermediate
+DS-36,Swasthya Vihar,4,Intermediate
+DS-36,Krishi Bhawan,185,Destination
+DS-37,I P Extantion (Madhu vihar),1,Origin
+DS-37,Ashirwad Apartment,2,Intermediate
+DS-37,Chander Vihar,3,Intermediate
+DS-37,Mandawali,4,Intermediate
+DS-37,Nehru Place,190,Destination
+DS-38,I P Extantion (Madhu vihar),1,Origin
+DS-38,Karkari More,2,Intermediate
+DS-38,New Rajdhani Encalve,3,Intermediate
+DS-38,Swasthya Vihar,4,Intermediate
+DS-38,JLN Stadium,195,Destination
+DS-39,I P Extantion (Madhu vihar),1,Origin
+DS-39,Karkari More,2,Intermediate
+DS-39,New Rajdhani Encalve,3,Intermediate
+DS-39,Swasthya Vihar,4,Intermediate
+DS-39,Shivaji Stadium,200,Destination
+DS-40,I P Extantion (Madhu vihar),1,Origin
+DS-40,Karkari More,2,Intermediate
+DS-40,New Rajdhani Encalve,3,Intermediate
+DS-40,Swasthya Vihar,4,Intermediate
+DS-40,Kend. Terminal,205,Destination

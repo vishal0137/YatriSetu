@@ -1,0 +1,641 @@
+"""
+Data Extractor Module for YatriSetu
+Extracts buses, routes, and fares data from CSV and PDF files
+Validates data structure and inserts into database
+"""
+
+import csv
+import re
+import pandas as pd
+from datetime import datetime
+from typing import Dict, List, Tuple, Optional
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class DataExtractor:
+    """
+    Main class for extracting and validating transport data from files
+    """
+    
+    def __init__(self, db_connection=None):
+        """
+        Initialize the data extractor
+        
+        Args:
+            db_connection: Database connection object (optional)
+        """
+        self.db = db_connection
+        self.validation_errors = []
+        self.extracted_data = {
+            'buses': [],
+            'routes': [],
+            'fares': [],
+            'stops': []
+        }
+        
+        # Define expected data structures
+        self.expected_schemas = {
+            'buses': ['bus_number', 'bus_type', 'capacity', 'status'],
+            'routes': ['route_number', 'route_name', 'start_location', 'end_location', 'distance'],
+            'fares': ['route_id', 'passenger_type', 'fare_amount'],
+            'stops': ['stop_name', 'latitude', 'longitude', 'route_id', 'sequence']
+        }
+        
+        # Valid values for categorical fields
+        self.valid_categories = {
+            'bus_type': ['AC', 'Non-AC', 'Electric', 'CNG', 'Diesel'],
+            'status': ['Active', 'Inactive', 'Maintenance', 'Retired'],
+            'passenger_type': ['General', 'Student', 'Senior Citizen', 'Differently Abled', 'Child']
+        }
+    
+    def detect_file_type(self, file_path: str) -> str:
+        """
+        Detect file type from extension
+        
+        Args:
+            file_path: Path to the file
+            
+        Returns:
+            File type ('csv' or 'pdf')
+        """
+        if file_path.lower().endswith('.csv'):
+            return 'csv'
+        elif file_path.lower().endswith('.pdf'):
+            return 'pdf'
+        else:
+            raise ValueError(f"Unsupported file type: {file_path}")
+    
+    def analyze_csv_structure(self, file_path: str) -> Dict:
+        """
+        Analyze CSV file structure and detect data categories
+        
+        Args:
+            file_path: Path to CSV file
+            
+        Returns:
+            Dictionary with file analysis results
+        """
+        try:
+            df = pd.read_csv(file_path)
+            
+            analysis = {
+                'file_path': file_path,
+                'total_rows': len(df),
+                'total_columns': len(df.columns),
+                'columns': list(df.columns),
+                'data_types': df.dtypes.to_dict(),
+                'null_counts': df.isnull().sum().to_dict(),
+                'detected_category': None,
+                'matching_score': 0
+            }
+            
+            # Detect which category this file belongs to
+            category, score = self._detect_data_category(df.columns)
+            analysis['detected_category'] = category
+            analysis['matching_score'] = score
+            
+            # Sample data
+            analysis['sample_data'] = df.head(3).to_dict('records')
+            
+            logger.info(f"CSV Analysis: {analysis['detected_category']} detected with {score}% confidence")
+            
+            return analysis
+            
+        except Exception as e:
+            logger.error(f"Error analyzing CSV: {str(e)}")
+            raise
+    
+    def _detect_data_category(self, columns: List[str]) -> Tuple[str, int]:
+        """
+        Detect which data category (buses, routes, fares, stops) based on columns
+        
+        Args:
+            columns: List of column names
+            
+        Returns:
+            Tuple of (category_name, matching_percentage)
+        """
+        columns_lower = [col.lower().strip() for col in columns]
+        best_match = None
+        best_score = 0
+        
+        for category, expected_cols in self.expected_schemas.items():
+            matches = 0
+            for expected_col in expected_cols:
+                # Check for exact or partial matches
+                for col in columns_lower:
+                    if expected_col.lower() in col or col in expected_col.lower():
+                        matches += 1
+                        break
+            
+            score = int((matches / len(expected_cols)) * 100)
+            
+            if score > best_score:
+                best_score = score
+                best_match = category
+        
+        return best_match, best_score
+    
+    def extract_buses_from_csv(self, file_path: str) -> List[Dict]:
+        """
+        Extract bus data from CSV file
+        
+        Args:
+            file_path: Path to CSV file
+            
+        Returns:
+            List of bus dictionaries
+        """
+        try:
+            df = pd.read_csv(file_path)
+            buses = []
+            
+            # Normalize column names
+            df.columns = [col.lower().strip().replace(' ', '_') for col in df.columns]
+            
+            for idx, row in df.iterrows():
+                bus = {
+                    'bus_number': self._extract_value(row, ['bus_number', 'bus_no', 'registration_number', 'vehicle_number']),
+                    'bus_type': self._extract_value(row, ['bus_type', 'type', 'category']),
+                    'capacity': self._extract_value(row, ['capacity', 'seating_capacity', 'seats']),
+                    'status': self._extract_value(row, ['status', 'operational_status', 'state']),
+                    'manufacturer': self._extract_value(row, ['manufacturer', 'make', 'brand']),
+                    'model': self._extract_value(row, ['model', 'vehicle_model']),
+                    'year': self._extract_value(row, ['year', 'manufacturing_year', 'model_year'])
+                }
+                
+                # Validate bus data
+                if self._validate_bus_data(bus, idx + 1):
+                    buses.append(bus)
+            
+            self.extracted_data['buses'] = buses
+            logger.info(f"Extracted {len(buses)} buses from CSV")
+            
+            return buses
+            
+        except Exception as e:
+            logger.error(f"Error extracting buses: {str(e)}")
+            raise
+    
+    def extract_routes_from_csv(self, file_path: str) -> List[Dict]:
+        """
+        Extract route data from CSV file
+        
+        Args:
+            file_path: Path to CSV file
+            
+        Returns:
+            List of route dictionaries
+        """
+        try:
+            df = pd.read_csv(file_path)
+            routes = []
+            
+            # Normalize column names
+            df.columns = [col.lower().strip().replace(' ', '_') for col in df.columns]
+            
+            for idx, row in df.iterrows():
+                route = {
+                    'route_number': self._extract_value(row, ['route_number', 'route_no', 'route_id', 'route_code']),
+                    'route_name': self._extract_value(row, ['route_name', 'name', 'route_description']),
+                    'start_location': self._extract_value(row, ['start_location', 'origin', 'from', 'source', 'start_point']),
+                    'end_location': self._extract_value(row, ['end_location', 'destination', 'to', 'end_point']),
+                    'distance': self._extract_value(row, ['distance', 'total_distance', 'route_distance']),
+                    'duration': self._extract_value(row, ['duration', 'travel_time', 'estimated_time']),
+                    'frequency': self._extract_value(row, ['frequency', 'service_frequency', 'buses_per_hour'])
+                }
+                
+                # Validate route data
+                if self._validate_route_data(route, idx + 1):
+                    routes.append(route)
+            
+            self.extracted_data['routes'] = routes
+            logger.info(f"Extracted {len(routes)} routes from CSV")
+            
+            return routes
+            
+        except Exception as e:
+            logger.error(f"Error extracting routes: {str(e)}")
+            raise
+    
+    def extract_fares_from_csv(self, file_path: str) -> List[Dict]:
+        """
+        Extract fare data from CSV file
+        
+        Args:
+            file_path: Path to CSV file
+            
+        Returns:
+            List of fare dictionaries
+        """
+        try:
+            df = pd.read_csv(file_path)
+            fares = []
+            
+            # Normalize column names
+            df.columns = [col.lower().strip().replace(' ', '_') for col in df.columns]
+            
+            for idx, row in df.iterrows():
+                fare = {
+                    'route_id': self._extract_value(row, ['route_id', 'route_number', 'route_no']),
+                    'passenger_type': self._extract_value(row, ['passenger_type', 'category', 'type', 'passenger_category']),
+                    'fare_amount': self._extract_value(row, ['fare_amount', 'fare', 'price', 'amount', 'cost']),
+                    'distance_range': self._extract_value(row, ['distance_range', 'distance', 'km_range']),
+                    'effective_date': self._extract_value(row, ['effective_date', 'valid_from', 'start_date'])
+                }
+                
+                # Validate fare data
+                if self._validate_fare_data(fare, idx + 1):
+                    fares.append(fare)
+            
+            self.extracted_data['fares'] = fares
+            logger.info(f"Extracted {len(fares)} fares from CSV")
+            
+            return fares
+            
+        except Exception as e:
+            logger.error(f"Error extracting fares: {str(e)}")
+            raise
+    
+    def extract_stops_from_csv(self, file_path: str) -> List[Dict]:
+        """
+        Extract stop data from CSV file
+        
+        Args:
+            file_path: Path to CSV file
+            
+        Returns:
+            List of stop dictionaries
+        """
+        try:
+            df = pd.read_csv(file_path)
+            stops = []
+            
+            # Normalize column names
+            df.columns = [col.lower().strip().replace(' ', '_') for col in df.columns]
+            
+            for idx, row in df.iterrows():
+                stop = {
+                    'stop_name': self._extract_value(row, ['stop_name', 'name', 'station_name', 'location']),
+                    'latitude': self._extract_value(row, ['latitude', 'lat']),
+                    'longitude': self._extract_value(row, ['longitude', 'lon', 'lng', 'long']),
+                    'route_id': self._extract_value(row, ['route_id', 'route_number', 'route_no']),
+                    'sequence': self._extract_value(row, ['sequence', 'stop_sequence', 'order', 'stop_order']),
+                    'arrival_time': self._extract_value(row, ['arrival_time', 'arrival', 'time'])
+                }
+                
+                # Validate stop data
+                if self._validate_stop_data(stop, idx + 1):
+                    stops.append(stop)
+            
+            self.extracted_data['stops'] = stops
+            logger.info(f"Extracted {len(stops)} stops from CSV")
+            
+            return stops
+            
+        except Exception as e:
+            logger.error(f"Error extracting stops: {str(e)}")
+            raise
+    
+    def extract_from_pdf(self, file_path: str) -> Dict:
+        """
+        Extract data from PDF file
+        Requires: pip install PyPDF2 pdfplumber tabula-py
+        
+        Args:
+            file_path: Path to PDF file
+            
+        Returns:
+            Dictionary with extracted data
+        """
+        try:
+            import pdfplumber
+            
+            extracted_text = []
+            tables = []
+            
+            with pdfplumber.open(file_path) as pdf:
+                for page_num, page in enumerate(pdf.pages, 1):
+                    # Extract text
+                    text = page.extract_text()
+                    if text:
+                        extracted_text.append({
+                            'page': page_num,
+                            'text': text
+                        })
+                    
+                    # Extract tables
+                    page_tables = page.extract_tables()
+                    if page_tables:
+                        for table_num, table in enumerate(page_tables, 1):
+                            tables.append({
+                                'page': page_num,
+                                'table_number': table_num,
+                                'data': table
+                            })
+            
+            logger.info(f"Extracted {len(tables)} tables from PDF")
+            
+            return {
+                'text': extracted_text,
+                'tables': tables,
+                'total_pages': len(pdf.pages)
+            }
+            
+        except ImportError:
+            logger.error("PDF extraction requires: pip install pdfplumber")
+            raise
+        except Exception as e:
+            logger.error(f"Error extracting from PDF: {str(e)}")
+            raise
+    
+    def _extract_value(self, row: pd.Series, possible_keys: List[str]) -> Optional[str]:
+        """
+        Extract value from row using multiple possible column names
+        
+        Args:
+            row: Pandas Series (row)
+            possible_keys: List of possible column names
+            
+        Returns:
+            Extracted value or None
+        """
+        for key in possible_keys:
+            if key in row.index and pd.notna(row[key]):
+                return str(row[key]).strip()
+        return None
+    
+    def _validate_bus_data(self, bus: Dict, row_num: int) -> bool:
+        """
+        Validate bus data
+        
+        Args:
+            bus: Bus dictionary
+            row_num: Row number for error reporting
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        errors = []
+        
+        # Required fields
+        if not bus.get('bus_number'):
+            errors.append(f"Row {row_num}: Missing bus_number")
+        
+        # Validate bus_type
+        if bus.get('bus_type') and bus['bus_type'] not in self.valid_categories['bus_type']:
+            errors.append(f"Row {row_num}: Invalid bus_type '{bus['bus_type']}'")
+        
+        # Validate capacity
+        if bus.get('capacity'):
+            try:
+                capacity = int(bus['capacity'])
+                if capacity <= 0 or capacity > 200:
+                    errors.append(f"Row {row_num}: Invalid capacity {capacity}")
+            except ValueError:
+                errors.append(f"Row {row_num}: Capacity must be a number")
+        
+        # Validate status
+        if bus.get('status') and bus['status'] not in self.valid_categories['status']:
+            errors.append(f"Row {row_num}: Invalid status '{bus['status']}'")
+        
+        if errors:
+            self.validation_errors.extend(errors)
+            logger.warning(f"Validation errors for bus at row {row_num}: {errors}")
+            return False
+        
+        return True
+    
+    def _validate_route_data(self, route: Dict, row_num: int) -> bool:
+        """
+        Validate route data
+        
+        Args:
+            route: Route dictionary
+            row_num: Row number for error reporting
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        errors = []
+        
+        # Required fields
+        if not route.get('route_number'):
+            errors.append(f"Row {row_num}: Missing route_number")
+        
+        if not route.get('start_location'):
+            errors.append(f"Row {row_num}: Missing start_location")
+        
+        if not route.get('end_location'):
+            errors.append(f"Row {row_num}: Missing end_location")
+        
+        # Validate distance
+        if route.get('distance'):
+            try:
+                distance = float(route['distance'])
+                if distance <= 0:
+                    errors.append(f"Row {row_num}: Distance must be positive")
+            except ValueError:
+                errors.append(f"Row {row_num}: Distance must be a number")
+        
+        if errors:
+            self.validation_errors.extend(errors)
+            logger.warning(f"Validation errors for route at row {row_num}: {errors}")
+            return False
+        
+        return True
+    
+    def _validate_fare_data(self, fare: Dict, row_num: int) -> bool:
+        """
+        Validate fare data
+        
+        Args:
+            fare: Fare dictionary
+            row_num: Row number for error reporting
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        errors = []
+        
+        # Required fields
+        if not fare.get('route_id'):
+            errors.append(f"Row {row_num}: Missing route_id")
+        
+        if not fare.get('passenger_type'):
+            errors.append(f"Row {row_num}: Missing passenger_type")
+        
+        # Validate passenger_type
+        if fare.get('passenger_type') and fare['passenger_type'] not in self.valid_categories['passenger_type']:
+            errors.append(f"Row {row_num}: Invalid passenger_type '{fare['passenger_type']}'")
+        
+        # Validate fare_amount
+        if not fare.get('fare_amount'):
+            errors.append(f"Row {row_num}: Missing fare_amount")
+        else:
+            try:
+                amount = float(fare['fare_amount'])
+                if amount < 0:
+                    errors.append(f"Row {row_num}: Fare amount cannot be negative")
+            except ValueError:
+                errors.append(f"Row {row_num}: Fare amount must be a number")
+        
+        if errors:
+            self.validation_errors.extend(errors)
+            logger.warning(f"Validation errors for fare at row {row_num}: {errors}")
+            return False
+        
+        return True
+    
+    def _validate_stop_data(self, stop: Dict, row_num: int) -> bool:
+        """
+        Validate stop data
+        
+        Args:
+            stop: Stop dictionary
+            row_num: Row number for error reporting
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        errors = []
+        
+        # Required fields
+        if not stop.get('stop_name'):
+            errors.append(f"Row {row_num}: Missing stop_name")
+        
+        # Validate coordinates
+        if stop.get('latitude'):
+            try:
+                lat = float(stop['latitude'])
+                if lat < -90 or lat > 90:
+                    errors.append(f"Row {row_num}: Invalid latitude {lat}")
+            except ValueError:
+                errors.append(f"Row {row_num}: Latitude must be a number")
+        
+        if stop.get('longitude'):
+            try:
+                lon = float(stop['longitude'])
+                if lon < -180 or lon > 180:
+                    errors.append(f"Row {row_num}: Invalid longitude {lon}")
+            except ValueError:
+                errors.append(f"Row {row_num}: Longitude must be a number")
+        
+        # Validate sequence
+        if stop.get('sequence'):
+            try:
+                seq = int(stop['sequence'])
+                if seq < 1:
+                    errors.append(f"Row {row_num}: Sequence must be positive")
+            except ValueError:
+                errors.append(f"Row {row_num}: Sequence must be a number")
+        
+        if errors:
+            self.validation_errors.extend(errors)
+            logger.warning(f"Validation errors for stop at row {row_num}: {errors}")
+            return False
+        
+        return True
+    
+    def get_validation_report(self) -> Dict:
+        """
+        Get validation report
+        
+        Returns:
+            Dictionary with validation statistics
+        """
+        return {
+            'total_errors': len(self.validation_errors),
+            'errors': self.validation_errors,
+            'extracted_counts': {
+                'buses': len(self.extracted_data['buses']),
+                'routes': len(self.extracted_data['routes']),
+                'fares': len(self.extracted_data['fares']),
+                'stops': len(self.extracted_data['stops'])
+            }
+        }
+    
+    def export_to_csv(self, category: str, output_path: str):
+        """
+        Export extracted data to CSV
+        
+        Args:
+            category: Data category (buses, routes, fares, stops)
+            output_path: Output CSV file path
+        """
+        if category not in self.extracted_data:
+            raise ValueError(f"Invalid category: {category}")
+        
+        data = self.extracted_data[category]
+        if not data:
+            logger.warning(f"No data to export for category: {category}")
+            return
+        
+        df = pd.DataFrame(data)
+        df.to_csv(output_path, index=False)
+        logger.info(f"Exported {len(data)} {category} records to {output_path}")
+    
+    def insert_to_database(self, category: str) -> int:
+        """
+        Insert extracted data into database
+        
+        Args:
+            category: Data category (buses, routes, fares, stops)
+            
+        Returns:
+            Number of records inserted
+        """
+        if not self.db:
+            raise ValueError("Database connection not provided")
+        
+        if category not in self.extracted_data:
+            raise ValueError(f"Invalid category: {category}")
+        
+        data = self.extracted_data[category]
+        if not data:
+            logger.warning(f"No data to insert for category: {category}")
+            return 0
+        
+        # This is a placeholder - implement actual database insertion
+        # based on your database schema and ORM
+        logger.info(f"Would insert {len(data)} {category} records to database")
+        
+        return len(data)
+
+
+def main():
+    """
+    Example usage of DataExtractor
+    """
+    # Initialize extractor
+    extractor = DataExtractor()
+    
+    # Example: Analyze CSV file
+    print("=== Analyzing CSV File ===")
+    analysis = extractor.analyze_csv_structure('sample_buses.csv')
+    print(f"Detected Category: {analysis['detected_category']}")
+    print(f"Confidence: {analysis['matching_score']}%")
+    print(f"Columns: {analysis['columns']}")
+    
+    # Example: Extract buses
+    print("\n=== Extracting Buses ===")
+    buses = extractor.extract_buses_from_csv('sample_buses.csv')
+    print(f"Extracted {len(buses)} buses")
+    
+    # Example: Get validation report
+    print("\n=== Validation Report ===")
+    report = extractor.get_validation_report()
+    print(f"Total Errors: {report['total_errors']}")
+    print(f"Extracted Counts: {report['extracted_counts']}")
+    
+    # Example: Export to CSV
+    print("\n=== Exporting Data ===")
+    extractor.export_to_csv('buses', 'output_buses.csv')
+
+
+if __name__ == '__main__':
+    main()
