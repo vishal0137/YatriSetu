@@ -82,19 +82,25 @@ These observations highlight that although partial digital solutions exist, ther
 
 ```
 YatriSetu_Prototype/
-├── venv/                      # Virtual environment
 ├── app/                       # Main application
+│   ├── models/               # Core models and processors
+│   │   ├── chatbot.py       # AI chatbot model
+│   │   ├── data_extractor.py # Data extraction model
+│   │   ├── database_models.py # Database ORM models
+│   │   └── unified_data_processor.py # Unified processing pipeline
+│   ├── routes/               # Flask route handlers
 │   ├── static/               # Static files (CSS, JS, images)
 │   ├── templates/            # HTML templates
-│   ├── routes/               # Route handlers
-│   └── models/               # Database models
-├── database/                  # Database files
-│   └── YATRISETU_DB.sql     # PostgreSQL database dump
+│   └── chatbot_modules/      # Chatbot processing modules
+├── database/                  # Database files and scripts
 ├── docs/                      # Documentation
+├── ml/                        # Machine learning models
+├── tests/                     # Test suite
+├── processed_data/            # Finalized CSV files ready for import
+├── process_dtc_data.py       # CLI tool for data processing
 ├── requirements.txt           # Python dependencies
 ├── config.py                  # Configuration file
-├── run.py                     # Application entry point
-└── README.md                  # This file
+└── run.py                     # Application entry point
 ```
 
 ## Technology Stack

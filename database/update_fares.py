@@ -4,7 +4,7 @@ Based on distance ranges
 """
 
 from app import create_app, db
-from app.models import Route
+from app.models.database_models import Route
 
 def update_fares():
     """Update all route fares based on distance"""

@@ -12,7 +12,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import db, create_app
-from app.models import Route, Bus, Stop, Booking, User
+from app.models.database_models import Route, Bus, Stop, Booking, User
 from ml.ml_intent_classifier import IntentClassifier
 from ml.ml_entity_extractor import EntityExtractor
 

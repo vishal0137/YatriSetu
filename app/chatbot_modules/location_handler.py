@@ -5,7 +5,7 @@ Handles location normalization, fuzzy matching, and aliases
 
 from difflib import SequenceMatcher
 from app import db
-from app.models import Route, Stop
+from app.models.database_models import Route, Stop
 
 class LocationHandler:
     """Handles all location-related operations"""

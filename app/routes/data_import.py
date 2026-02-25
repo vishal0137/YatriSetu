@@ -7,7 +7,7 @@ from flask import Blueprint, render_template, request, jsonify, flash, redirect,
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
-from app.data_extractor import DataExtractor
+from app.models.data_extractor import DataExtractor
 
 # Create blueprint
 data_import_bp = Blueprint('data_import', __name__)

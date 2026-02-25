@@ -1,0 +1,83 @@
+route_id,stop_name,sequence,stop_type
+Route No.,Origin Point,1,Origin
+Route No.,Destination Point,2,Destination
+DS-1,Dwarka Sector-6/7 X- ing,1,Origin
+DS-1,Nehru Place(T),2,Destination
+DS-2,Dwarka Sec-4/5 Xing (Ashirwad Chowk),1,Origin
+DS-2,CGO Complex (JLN Stadium),2,Destination
+DS-3,Dwarka Sector-19 (Pocket-2),1,Origin
+DS-3,Shastri Bhawan,2,Destination
+DS-4,DwarkaSector-14(LIG Flat),1,Origin
+DS-4,Connaught Place (Shivaji Stadium),2,Destination
+DS-5,Rohini Sec-22,1,Origin
+DS-5,Nehru Place(T),2,Destination
+DS-6,Rohini Sec-16,1,Origin
+DS-6,CGO Complex (JLN Stadium),2,Destination
+DS-7,Rohini Sec-23,1,Origin
+DS-7,Shastri Bhawan,2,Destination
+DS-8,Rohini(Avantika),1,Origin
+DS-8,Connaught Place (Shivaji Stadium),2,Destination
+DS-9,Badarpur Border,1,Origin
+DS-9,Nehru Place(T),2,Destination
+DS-10,Badarpur Border,1,Origin
+DS-10,Krishi Bhawan,2,Destination
+DS-11,Badarpur Border,1,Origin
+DS-11,CGO Complex (JLN Stadium,2,Destination
+DS-12,Badarpur Border,1,Origin
+DS-12,Connaught Place(Shivaji Stadium),2,Destination
+DS-13,Janak Puri B-2,1,Origin
+DS-13,Nehru Place(T),2,Destination
+DS-14,Janak Puri A-1,1,Origin
+DS-14,CGO Complex (JLN Stadium),2,Destination
+DS-15,Janak Puri C-1,1,Origin
+DS-15,Shastri Bhawan,2,Destination
+DS-16,Janak Puri C-2,1,Origin
+DS-16,Connaught Place (Shivaji Stadium),2,Destination
+DS-17,I P Extantion (Balco Apartment),1,Origin
+DS-17,Nehru Place(T),2,Destination
+DS-18,I P Extantion j(Balco Apartment),1,Origin
+DS-18,CGO Complex (JLN Stadium),2,Destination
+DS-19,I P Extantion (Balco Apartment),1,Origin
+DS-19,Shastri Bhawan,2,Destination
+DS-20,I P Extantion (Balco Apartment),1,Origin
+DS-20,Connaught Place (Shivaji Stadium),2,Destination
+DS-21,Dwarka Sec-23 Near Harmoni Apartment,1,Origin
+DS-21,Krishi Bhawam,2,Destination
+DS-22,Dwarka Sec-19 Pkt-3 (DTC Bus Stand),1,Origin
+DS-22,Nehru Place,2,Destination
+DS-23,Dwarka Sec-8 (Depot Gate),1,Origin
+DS-23,JLN Stadium,2,Destination
+DS-24,Dwarka Sec-3 (Madhu vihar),1,Origin
+DS-24,Shivaji Stadium,2,Destination
+DS-25,Dwarka Sec-16 Pkt-C (GGS University),1,Origin
+DS-25,Kend. Terminal,2,Destination
+DS-26,Janak Puri C-2B,1,Origin
+DS-26,JLN Stadium,2,Destination
+DS-27,Janak Puri D-Block,1,Origin
+DS-27,Shivaji Stadium,2,Destination
+DS-28,janak Puri B-I Terminal,1,Origin
+DS-28,Nehru Place,2,Destination
+DS-29,Janak Puri C-4 H,1,Origin
+DS-29,Krishi Bhawan,2,Destination
+DS-30,Janak Puri A-3 (Near Mota Singh School),1,Origin
+DS-30,Kend. Terminal,2,Destination
+DS-31,Rohini Sec-13 (Sachdeva Pub. School),1,Origin
+DS-31,Krishi Bhawam,2,Destination
+DS-32,Avantika (Rohini Sector-1),1,Origin
+DS-32,Nehru Place,2,Destination
+DS-33,Rohini Sec-11 SFS Flats,1,Origin
+DS-33,JLN Stadium,2,Destination
+DS-34,Rohini Sec-18 (Near Telephone Exchange),1,Origin
+DS-34,Shivaji Stadium,2,Destination
+DS-35,Rohini Sec-27 (DTC Bus Stand),1,Origin
+DS-35,Kend. Terminal,2,Destination
+DS-36,I P Extantion (Madhu vihar),1,Origin
+DS-36,Krishi Bhawan,2,Destination
+DS-37,I P Extantion (Madhu vihar),1,Origin
+DS-37,Nehru Place,2,Destination
+DS-38,I P Extantion (Madhu vihar),1,Origin
+DS-38,JLN Stadium,2,Destination
+DS-39,I P Extantion (Madhu vihar),1,Origin
+DS-39,Shivaji Stadium,2,Destination
+DS-40,I P Extantion (Madhu vihar),1,Origin
+DS-40,Kend. Terminal,2,Destination

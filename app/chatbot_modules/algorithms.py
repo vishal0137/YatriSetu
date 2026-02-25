@@ -4,7 +4,7 @@ Implements Dijkstra's and Greedy algorithms for route optimization
 """
 
 import heapq
-from app.models import Route, Stop
+from app.models.database_models import Route, Stop
 
 class PathfindingAlgorithms:
     """Implements pathfinding algorithms for route optimization"""

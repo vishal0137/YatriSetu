@@ -5,7 +5,7 @@ Modular architecture with separate components for maintainability
 """
 
 from app import db
-from app.models import Route, Stop, Bus, Booking, LiveBusLocation
+from app.models.database_models import Route, Stop, Bus, Booking, LiveBusLocation
 from sqlalchemy import func, or_, and_
 import re
 from datetime import datetime

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from app import db
-from app.models import User, Bus, Route, Booking, Payment, LiveBusLocation, Driver, Conductor
+from app.models.database_models import User, Bus, Route, Booking, Payment, LiveBusLocation, Driver, Conductor
 from sqlalchemy import func, extract
 from datetime import datetime, timedelta
 

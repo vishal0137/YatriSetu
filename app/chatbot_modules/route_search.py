@@ -4,7 +4,7 @@ Handles route searching and recommendations
 """
 
 from sqlalchemy import or_, and_
-from app.models import Route, Stop, Bus, Booking
+from app.models.database_models import Route, Stop, Bus, Booking
 
 class RouteSearchHandler:
     """Handles route search operations"""

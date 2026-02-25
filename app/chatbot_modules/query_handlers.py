@@ -4,7 +4,7 @@ Handles specific query types (fare, booking, AC bus, etc.)
 """
 
 import re
-from app.models import Route, Bus, Booking
+from app.models.database_models import Route, Bus, Booking
 from .algorithms import PathfindingAlgorithms
 
 class QueryHandlers:

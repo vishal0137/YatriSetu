@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app
-from app.chatbot import chatbot
+from app.models.chatbot import chatbot
 import re
 
 def has_emoji(text):

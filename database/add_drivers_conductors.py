@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import create_app, db
-from app.models import Driver, Conductor, Bus, Route
+from app.models.database_models import Driver, Conductor, Bus, Route
 from datetime import datetime, date, timedelta
 import random
 

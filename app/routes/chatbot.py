@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, session
-from app.chatbot import chatbot
+from app.models.chatbot import chatbot
 import uuid
 
 bp = Blueprint('chatbot', __name__, url_prefix='/chatbot')

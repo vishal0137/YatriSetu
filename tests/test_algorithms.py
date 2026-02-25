@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app import create_app
 from app.chatbot_modules.algorithms import PathfindingAlgorithms
-from app.models import Route, Stop, Bus
+from app.models.database_models import Route, Stop, Bus
 
 app = create_app()
 
