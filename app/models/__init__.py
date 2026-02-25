@@ -1,6 +1,6 @@
 """
 YatriSetu Models Package
-Contains all core models and processors for the YatriSetu Smart Transit Platform
+Contains all core models for the YatriSetu Smart Transit Platform
 """
 
 # Database ORM Models
@@ -8,8 +8,6 @@ from .database_models import User, Bus, Route, Booking, Payment, LiveBusLocation
 
 # Core Processing Models
 from .chatbot import SamparkChatbot, chatbot
-from .data_extractor import DataExtractor
-from .unified_data_processor import UnifiedDataProcessor
 
 # Backward compatibility alias
 Chatbot = SamparkChatbot
@@ -29,9 +27,7 @@ __all__ = [
     # Processing Models
     'SamparkChatbot',
     'Chatbot',  # Alias for backward compatibility
-    'chatbot',
-    'DataExtractor',
-    'UnifiedDataProcessor'
+    'chatbot'
 ]
 
 __version__ = '1.0.0'

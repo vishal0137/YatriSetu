@@ -25,9 +25,6 @@ This folder contains all documentation for the YatriSetu Smart Transit Platform.
 |----------|-------------|--------|
 | [CHATBOT_QUICK_REFERENCE.md](CHATBOT_QUICK_REFERENCE.md) | Chatbot commands and API reference | Current |
 | [CHATBOT_CONVERSATIONAL_FLOW.md](CHATBOT_CONVERSATIONAL_FLOW.md) | Chatbot conversation patterns | Current |
-| [DATA_IMPORT_FEATURE.md](DATA_IMPORT_FEATURE.md) | Original data import documentation | Current |
-| [DATA_IMPORT_ENHANCED.md](DATA_IMPORT_ENHANCED.md) | Enhanced data import with preview | Current |
-| [DUPLICATE_DETECTION_GUIDE.md](DUPLICATE_DETECTION_GUIDE.md) | Duplicate detection guide with examples | Current |
 | [LIVE_TRACKING_FEATURE.md](LIVE_TRACKING_FEATURE.md) | Live bus tracking feature | Current |
 | [ROUTE_FILTERING_FEATURE.md](ROUTE_FILTERING_FEATURE.md) | Route filtering functionality | Current |
 
@@ -110,7 +107,6 @@ When adding or updating documentation:
 ### Most Used Documents
 - [Getting Started Guide](GETTING_STARTED.md)
 - [Project Status](PROJECT_STATUS.md)
-- [Data Import Enhanced](DATA_IMPORT_ENHANCED.md)
 - [Chatbot Reference](CHATBOT_QUICK_REFERENCE.md)
 - [Testing Guide](TESTING_GUIDE.md)
 
@@ -120,9 +116,8 @@ When adding or updating documentation:
 - [ML Quickstart](ML_QUICKSTART.md)
 
 ### For Admins
-- [Data Import Feature](DATA_IMPORT_ENHANCED.md)
-- [Duplicate Detection Guide](DUPLICATE_DETECTION_GUIDE.md)
 - [Live Tracking Feature](LIVE_TRACKING_FEATURE.md)
+- [Route Filtering](ROUTE_FILTERING_FEATURE.md)
 
 ### For Users
 - [Chatbot Quick Reference](CHATBOT_QUICK_REFERENCE.md)

@@ -16,10 +16,9 @@ def create_app(config_class=Config):
         print("Server will run without database connection.")
     
     # Register blueprints
-    from app.routes import admin, chatbot, data_import
+    from app.routes import admin, chatbot
     app.register_blueprint(admin.bp)
     app.register_blueprint(chatbot.bp)
-    app.register_blueprint(data_import.data_import_bp)
     
     # Root route
     @app.route('/')
