@@ -30,7 +30,15 @@ class DataExtractor:
         """
         self.db = db_connection
         self.validation_errors = []
+        self.validation_warnings = []
+        self.duplicate_checks = []
         self.extracted_data = {
+            'buses': [],
+            'routes': [],
+            'fares': [],
+            'stops': []
+        }
+        self.preview_data = {
             'buses': [],
             'routes': [],
             'fares': [],
@@ -541,6 +549,140 @@ class DataExtractor:
         
         return True
     
+    def check_duplicates_in_database(self, category: str) -> Dict:
+        """
+        Check for duplicate entries in database
+        
+        Args:
+            category: Data category (buses, routes, fares, stops)
+            
+        Returns:
+            Dictionary with duplicate information
+        """
+        if not self.db:
+            logger.warning("Database connection not provided, skipping duplicate check")
+            return {'duplicates': [], 'total_duplicates': 0}
+        
+        from app.models.database_models import Bus, Route, Stop
+        
+        duplicates = []
+        data = self.extracted_data.get(category, [])
+        
+        try:
+            if category == 'buses':
+                for idx, bus in enumerate(data):
+                    existing = Bus.query.filter_by(bus_number=bus.get('bus_number')).first()
+                    if existing:
+                        duplicates.append({
+                            'index': idx,
+                            'field': 'bus_number',
+                            'value': bus.get('bus_number'),
+                            'existing_id': existing.id,
+                            'action': 'skip'  # Can be 'skip', 'update', or 'replace'
+                        })
+            
+            elif category == 'routes':
+                for idx, route in enumerate(data):
+                    existing = Route.query.filter_by(route_number=route.get('route_number')).first()
+                    if existing:
+                        duplicates.append({
+                            'index': idx,
+                            'field': 'route_number',
+                            'value': route.get('route_number'),
+                            'existing_id': existing.id,
+                            'existing_data': {
+                                'route_name': existing.route_name,
+                                'start_location': existing.start_location,
+                                'end_location': existing.end_location
+                            },
+                            'action': 'skip'
+                        })
+            
+            elif category == 'stops':
+                for idx, stop in enumerate(data):
+                    existing = Stop.query.filter_by(
+                        route_id=stop.get('route_id'),
+                        stop_name=stop.get('stop_name'),
+                        sequence=stop.get('sequence')
+                    ).first()
+                    if existing:
+                        duplicates.append({
+                            'index': idx,
+                            'field': 'stop_name + sequence',
+                            'value': f"{stop.get('stop_name')} (Seq: {stop.get('sequence')})",
+                            'existing_id': existing.id,
+                            'action': 'skip'
+                        })
+            
+            self.duplicate_checks = duplicates
+            logger.info(f"Found {len(duplicates)} potential duplicates in {category}")
+            
+        except Exception as e:
+            logger.error(f"Error checking duplicates: {str(e)}")
+        
+        return {
+            'duplicates': duplicates,
+            'total_duplicates': len(duplicates)
+        }
+    
+    def get_preview_data(self, category: str, limit: int = 100) -> List[Dict]:
+        """
+        Get preview of extracted data with editable fields
+        
+        Args:
+            category: Data category (buses, routes, fares, stops)
+            limit: Maximum number of records to preview
+            
+        Returns:
+            List of dictionaries with preview data
+        """
+        data = self.extracted_data.get(category, [])
+        preview = []
+        
+        for idx, record in enumerate(data[:limit]):
+            preview_record = {
+                'id': idx,
+                'data': record,
+                'is_duplicate': False,
+                'duplicate_info': None,
+                'validation_status': 'valid',
+                'editable': True,
+                'action': 'insert'  # insert, update, skip
+            }
+            
+            # Check if this record is a duplicate
+            for dup in self.duplicate_checks:
+                if dup['index'] == idx:
+                    preview_record['is_duplicate'] = True
+                    preview_record['duplicate_info'] = dup
+                    preview_record['action'] = 'skip'
+                    break
+            
+            preview.append(preview_record)
+        
+        self.preview_data[category] = preview
+        return preview
+    
+    def update_preview_record(self, category: str, record_id: int, updated_data: Dict, action: str = 'insert'):
+        """
+        Update a preview record with edited data
+        
+        Args:
+            category: Data category
+            record_id: Record ID in preview
+            updated_data: Updated data dictionary
+            action: Action to take (insert, update, skip)
+        """
+        if category not in self.preview_data:
+            raise ValueError(f"No preview data for category: {category}")
+        
+        for record in self.preview_data[category]:
+            if record['id'] == record_id:
+                record['data'] = updated_data
+                record['action'] = action
+                logger.info(f"Updated preview record {record_id} in {category}")
+                break
+    
     def get_validation_report(self) -> Dict:
         """
         Get validation report
@@ -550,7 +692,11 @@ class DataExtractor:
         """
         return {
             'total_errors': len(self.validation_errors),
+            'total_warnings': len(self.validation_warnings),
             'errors': self.validation_errors,
+            'warnings': self.validation_warnings,
+            'duplicates': self.duplicate_checks,
+            'total_duplicates': len(self.duplicate_checks),
             'extracted_counts': {
                 'buses': len(self.extracted_data['buses']),
                 'routes': len(self.extracted_data['routes']),
@@ -579,15 +725,16 @@ class DataExtractor:
         df.to_csv(output_path, index=False)
         logger.info(f"Exported {len(data)} {category} records to {output_path}")
     
-    def insert_to_database(self, category: str) -> int:
+    def insert_to_database(self, category: str, use_preview: bool = True) -> Dict:
         """
-        Insert extracted data into database
+        Insert extracted data into database with duplicate prevention
         
         Args:
             category: Data category (buses, routes, fares, stops)
+            use_preview: Use preview data with user modifications
             
         Returns:
-            Number of records inserted
+            Dictionary with insertion statistics
         """
         if not self.db:
             raise ValueError("Database connection not provided")
@@ -595,16 +742,153 @@ class DataExtractor:
         if category not in self.extracted_data:
             raise ValueError(f"Invalid category: {category}")
         
-        data = self.extracted_data[category]
-        if not data:
-            logger.warning(f"No data to insert for category: {category}")
-            return 0
+        from app.models.database_models import Bus, Route, Stop
+        from app import db as database
         
-        # This is a placeholder - implement actual database insertion
-        # based on your database schema and ORM
-        logger.info(f"Would insert {len(data)} {category} records to database")
+        # Use preview data if available and requested
+        if use_preview and self.preview_data.get(category):
+            data_to_insert = [
+                record['data'] for record in self.preview_data[category]
+                if record['action'] == 'insert'
+            ]
+            data_to_update = [
+                record for record in self.preview_data[category]
+                if record['action'] == 'update'
+            ]
+            data_to_skip = [
+                record for record in self.preview_data[category]
+                if record['action'] == 'skip'
+            ]
+        else:
+            data_to_insert = self.extracted_data[category]
+            data_to_update = []
+            data_to_skip = []
         
-        return len(data)
+        inserted_count = 0
+        updated_count = 0
+        skipped_count = len(data_to_skip)
+        errors = []
+        
+        try:
+            # Insert new records
+            if category == 'buses':
+                for bus_data in data_to_insert:
+                    try:
+                        # Check for duplicate one more time
+                        existing = Bus.query.filter_by(bus_number=bus_data.get('bus_number')).first()
+                        if existing:
+                            skipped_count += 1
+                            logger.warning(f"Skipping duplicate bus: {bus_data.get('bus_number')}")
+                            continue
+                        
+                        bus = Bus(
+                            bus_number=bus_data.get('bus_number'),
+                            registration_number=bus_data.get('bus_number'),  # Use bus_number as registration
+                            bus_type=bus_data.get('bus_type', 'Regular'),
+                            capacity=int(bus_data.get('capacity', 50)),
+                            is_active=bus_data.get('status', 'Active') == 'Active'
+                        )
+                        database.session.add(bus)
+                        inserted_count += 1
+                    except Exception as e:
+                        errors.append(f"Error inserting bus {bus_data.get('bus_number')}: {str(e)}")
+            
+            elif category == 'routes':
+                for route_data in data_to_insert:
+                    try:
+                        # Check for duplicate
+                        existing = Route.query.filter_by(route_number=route_data.get('route_number')).first()
+                        if existing:
+                            skipped_count += 1
+                            logger.warning(f"Skipping duplicate route: {route_data.get('route_number')}")
+                            continue
+                        
+                        route = Route(
+                            route_number=route_data.get('route_number'),
+                            route_name=route_data.get('route_name', ''),
+                            start_location=route_data.get('start_location'),
+                            end_location=route_data.get('end_location'),
+                            distance_km=float(route_data.get('distance', 0)) if route_data.get('distance') else None,
+                            estimated_duration_minutes=int(route_data.get('duration', 0)) if route_data.get('duration') else None,
+                            fare=50.0  # Default fare
+                        )
+                        database.session.add(route)
+                        inserted_count += 1
+                    except Exception as e:
+                        errors.append(f"Error inserting route {route_data.get('route_number')}: {str(e)}")
+            
+            elif category == 'stops':
+                for stop_data in data_to_insert:
+                    try:
+                        # Check for duplicate
+                        existing = Stop.query.filter_by(
+                            route_id=stop_data.get('route_id'),
+                            stop_name=stop_data.get('stop_name'),
+                            stop_order=int(stop_data.get('sequence', 0))
+                        ).first()
+                        if existing:
+                            skipped_count += 1
+                            logger.warning(f"Skipping duplicate stop: {stop_data.get('stop_name')}")
+                            continue
+                        
+                        # Get route by route_number
+                        route = Route.query.filter_by(route_number=stop_data.get('route_id')).first()
+                        if not route:
+                            errors.append(f"Route not found for stop: {stop_data.get('stop_name')}")
+                            continue
+                        
+                        stop = Stop(
+                            route_id=route.id,
+                            stop_name=stop_data.get('stop_name'),
+                            stop_order=int(stop_data.get('sequence', 0)),
+                            latitude=float(stop_data.get('latitude')) if stop_data.get('latitude') else None,
+                            longitude=float(stop_data.get('longitude')) if stop_data.get('longitude') else None,
+                            estimated_arrival_time=stop_data.get('arrival_time')
+                        )
+                        database.session.add(stop)
+                        inserted_count += 1
+                    except Exception as e:
+                        errors.append(f"Error inserting stop {stop_data.get('stop_name')}: {str(e)}")
+            
+            # Handle updates
+            for record in data_to_update:
+                try:
+                    if category == 'buses' and record.get('duplicate_info'):
+                        existing_id = record['duplicate_info']['existing_id']
+                        bus = Bus.query.get(existing_id)
+                        if bus:
+                            bus.bus_type = record['data'].get('bus_type', bus.bus_type)
+                            bus.capacity = int(record['data'].get('capacity', bus.capacity))
+                            updated_count += 1
+                    
+                    elif category == 'routes' and record.get('duplicate_info'):
+                        existing_id = record['duplicate_info']['existing_id']
+                        route = Route.query.get(existing_id)
+                        if route:
+                            route.route_name = record['data'].get('route_name', route.route_name)
+                            route.start_location = record['data'].get('start_location', route.start_location)
+                            route.end_location = record['data'].get('end_location', route.end_location)
+                            updated_count += 1
+                except Exception as e:
+                    errors.append(f"Error updating record: {str(e)}")
+            
+            # Commit all changes
+            database.session.commit()
+            logger.info(f"Database operation completed: {inserted_count} inserted, {updated_count} updated, {skipped_count} skipped")
+            
+        except Exception as e:
+            database.session.rollback()
+            logger.error(f"Database operation failed: {str(e)}")
+            errors.append(f"Transaction failed: {str(e)}")
+        
+        return {
+            'success': len(errors) == 0,
+            'inserted': inserted_count,
+            'updated': updated_count,
+            'skipped': skipped_count,
+            'errors': errors,
+            'total_processed': inserted_count + updated_count + skipped_count
+        }
 
 
 def main():
