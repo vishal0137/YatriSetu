@@ -11,6 +11,9 @@ from .chatbot import SamparkChatbot, chatbot
 from .data_extractor import DataExtractor
 from .unified_data_processor import UnifiedDataProcessor
 
+# Backward compatibility alias
+Chatbot = SamparkChatbot
+
 __all__ = [
     # Database Models
     'User',
@@ -25,6 +28,7 @@ __all__ = [
     'Conductor',
     # Processing Models
     'SamparkChatbot',
+    'Chatbot',  # Alias for backward compatibility
     'chatbot',
     'DataExtractor',
     'UnifiedDataProcessor'

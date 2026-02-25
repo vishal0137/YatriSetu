@@ -626,6 +626,41 @@ class UnifiedDataProcessor:
             'fares': self.extracted_data.get('fares', []),
             'buses': self.extracted_data.get('buses', [])
         }
+    
+    def get_validation_report(self) -> Dict:
+        """
+        Get validation report for all processed data
+        
+        Returns:
+            Dictionary with validation statistics
+        """
+        total_errors = 0
+        total_warnings = 0
+        errors = []
+        warnings = []
+        
+        # Collect validation results from all categories
+        for category in ['routes', 'stops', 'fares', 'buses']:
+            data = self.extracted_data.get(category, [])
+            if data:
+                validation = self._validate_data(data, category)
+                total_errors += validation.get('total_errors', 0)
+                total_warnings += validation.get('total_warnings', 0)
+                errors.extend(validation.get('errors', []))
+                warnings.extend(validation.get('warnings', []))
+        
+        return {
+            'total_errors': total_errors,
+            'total_warnings': total_warnings,
+            'errors': errors,
+            'warnings': warnings,
+            'extracted_counts': {
+                'routes': len(self.extracted_data.get('routes', [])),
+                'stops': len(self.extracted_data.get('stops', [])),
+                'fares': len(self.extracted_data.get('fares', [])),
+                'buses': len(self.extracted_data.get('buses', []))
+            }
+        }
 
 
 def main():

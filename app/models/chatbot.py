@@ -888,3 +888,6 @@ class SamparkChatbot:
 
 # Create singleton instance
 chatbot = SamparkChatbot()
+
+# Backward compatibility alias
+Chatbot = SamparkChatbot
