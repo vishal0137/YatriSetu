@@ -114,9 +114,22 @@ async function analyzeAndPreview() {
         uploadedFilePath = uploadResult.analysis.filepath;
         
         // Auto-detect category if not selected
-        if (!selectedCategory) {
+        if (!selectedCategory || selectedCategory === '') {
             selectedCategory = uploadResult.analysis.detected_category;
+            console.log('Auto-detected category:', selectedCategory);
         }
+        
+        // Validate category before proceeding
+        if (!selectedCategory || selectedCategory === '') {
+            hideLoading();
+            showAlert('error', 'Could not detect data category. Please select one manually.');
+            return;
+        }
+        
+        console.log('Sending preview request with:', {
+            filepath: uploadedFilePath,
+            category: selectedCategory
+        });
         
         // Get preview with duplicate checking
         const previewResponse = await fetch('/admin/api/data-import/preview', {
@@ -150,6 +163,7 @@ async function analyzeAndPreview() {
     } catch (error) {
         hideLoading();
         showAlert('error', 'Error: ' + error.message);
+        console.error('Preview error:', error);
     }
 }
 

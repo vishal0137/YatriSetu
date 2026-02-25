@@ -175,19 +175,41 @@ def preview_data():
     """
     try:
         data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+        
         filepath = data.get('filepath')
         category = data.get('category')
         
-        if not filepath or not os.path.exists(filepath):
+        # Log for debugging
+        print(f"Preview request - filepath: {filepath}, category: {category}")
+        
+        if not filepath:
             return jsonify({
                 'success': False,
-                'error': 'File not found'
+                'error': 'File path is required'
+            }), 400
+            
+        if not os.path.exists(filepath):
+            return jsonify({
+                'success': False,
+                'error': f'File not found: {filepath}'
             }), 404
+        
+        if not category:
+            return jsonify({
+                'success': False,
+                'error': 'Category is required. Please select a category.'
+            }), 400
         
         if category not in ['buses', 'routes', 'fares', 'stops']:
             return jsonify({
                 'success': False,
-                'error': 'Invalid category'
+                'error': f'Invalid category: {category}. Must be one of: buses, routes, fares, stops'
             }), 400
         
         # Initialize extractor with database connection
@@ -227,6 +249,9 @@ def preview_data():
         })
         
     except Exception as e:
+        print(f"Preview error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': str(e)
